@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F3F5F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#090E19" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bank of Life">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:400;font-display:swap;src:url("plus-jakarta-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:500;font-display:swap;src:url("plus-jakarta-sans-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:600;font-display:swap;src:url("plus-jakarta-sans-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:700;font-display:swap;src:url("plus-jakarta-sans-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:800;font-display:swap;src:url("plus-jakarta-sans-latin-800-normal.woff2") format("woff2")}
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-size:14px;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Bank of Life</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: mobile banking app — greeting + net worth, accounts list (checking, savings, cards, assets), bottom tab bar. Neutral surfaces; color in card art, category chips and money figures. Max width 760px. */
+:root{
+  --bg:#F3F5F9; --surface:#FFFFFF; --sunk:#F5F7FA; --ink:#0E1726; --muted:#667085; --line:#E5E8EE;
+  --brand:#1F6FEB; --brand-ink:#FFFFFF; --brand-soft:#E8F0FE; --navy:#0F1E3D;
+  --pos:#0E8A5F; --neg:#C4320A; --pos-soft:#E3F5EC; --neg-soft:#FDECE7; --warn:#B54708; --warn-soft:#FEF0DC; --gold:#D9A21B;
+  --c-cars:#1F6FEB; --c-off:#E8590C; --c-mkt:#0E9384; --c-guns:#475467; --c-homes:#7A5AF8; --c-air:#0BA5EC; --c-sea:#0086C9; --c-life:#DD2590; --c-staff:#DC6803; --c-nov:#CA8504; --c-mod:#344054;
+  --font:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:16px; --sh:0 1px 2px rgba(16,24,40,.05), 0 2px 6px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#090E19; --surface:#121A2B; --sunk:#0D1422; --ink:#EEF2F8; --muted:#98A2B6; --line:#232D42;
+  --brand:#5B9BFF; --brand-ink:#08111F; --brand-soft:#16264A; --navy:#0E1A36;
+  --pos:#38C98A; --neg:#FF7A59; --pos-soft:#0F2E22; --neg-soft:#3A1A12; --warn:#FDB022; --warn-soft:#33240A;
+  --c-cars:#5B9BFF; --c-off:#FF8B4C; --c-mkt:#2ED3B7; --c-guns:#98A2B3; --c-homes:#9E8CFC; --c-air:#36BFFA; --c-sea:#2EA8E5; --c-life:#F670C7; --c-staff:#FDB022; --c-nov:#EAAA08; --c-mod:#B0B8C9;
+  --sh:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#090E19; --surface:#121A2B; --sunk:#0D1422; --ink:#EEF2F8; --muted:#98A2B6; --line:#232D42;
+  --brand:#5B9BFF; --brand-ink:#08111F; --brand-soft:#16264A; --navy:#0E1A36;
+  --pos:#38C98A; --neg:#FF7A59; --pos-soft:#0F2E22; --neg-soft:#3A1A12; --warn:#FDB022; --warn-soft:#33240A;
+  --c-cars:#5B9BFF; --c-off:#FF8B4C; --c-mkt:#2ED3B7; --c-guns:#98A2B3; --c-homes:#9E8CFC; --c-air:#36BFFA; --c-sea:#2EA8E5; --c-life:#F670C7; --c-staff:#FDB022; --c-nov:#EAAA08; --c-mod:#B0B8C9;
+  --sh:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.lbl{font-size:12px;color:var(--muted);font-weight:600}
+h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.02em}
+h2{font-size:17px;font-weight:800;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h3{font-size:12px;font-weight:700;margin:0;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.sec{margin-top:22px}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.link{background:none;border:0;color:var(--brand);font-weight:700;font-size:13px;padding:2px 0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+main{padding-block:16px calc(96px + env(safe-area-inset-bottom,0px))}
+section[hidden]{display:none}
+
+/* top */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:14px 4px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:32px;height:32px;flex:none}
+.brand .hi{font-size:13px;color:var(--muted);font-weight:600}
+.brand .nm{font-weight:800;font-size:17px;letter-spacing:-.02em}
+.iconbtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0}
+.iconbtn svg{width:18px;height:18px}
+.lvlpill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:6px 10px;font-size:12px;font-weight:800;background:var(--surface);border:1px solid var(--line)}
+.lvlpill i{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+
+/* bottom nav */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
+.tb{background:none;border:0;display:grid;justify-items:center;gap:3px;padding:9px 2px 10px;font-size:11px;font-weight:700;color:var(--muted);position:relative}
+.tb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tb[aria-selected="true"]{color:var(--brand)}
+.tb .n{position:absolute;top:5px;left:calc(50% + 6px);font-size:10px;background:var(--neg);color:#fff;border-radius:99px;padding:0 5px;line-height:16px}
+
+/* net worth + accounts */
+.nw{padding:18px 18px 16px}
+.nw .v{font-size:clamp(32px,8vw,42px);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-top:2px}
+.nw .v.bump{animation:bump .5s ease}
+@keyframes bump{40%{transform:scale(1.03)}}
+.nw .split{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px}
+.nw .split .v2{font-weight:700}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--neg-soft);color:var(--neg);font-weight:600;font-size:13px;margin-top:12px}
+.alert svg{width:18px;height:18px;flex:none;margin-top:1px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.alert b{display:block;font-size:14px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.acc{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.acc:last-child{border-bottom:0}
+.acc:hover{background:var(--sunk)}
+.acc .t{font-weight:700}
+.acc .s{font-size:12px;color:var(--muted)}
+.acc .b{font-weight:800;font-size:16px;text-align:right}
+.acc .b small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.minicard{width:40px;height:28px;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ico.lg{width:48px;height:48px;border-radius:14px}.ico.lg svg{width:24px;height:24px}
+.ico.round{border-radius:50%}
+
+/* quick perks */
+.perks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.perk{padding:12px;display:grid;gap:6px;align-content:start}
+.perk .v{font-weight:800;font-size:18px;letter-spacing:-.02em}
+.perk small{font-size:12px;color:var(--muted);line-height:1.3}
+.meter{height:6px;border-radius:99px;background:var(--sunk);overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;border-radius:99px;background:var(--brand);transition:width .5s}
+.meter.gold i{background:var(--gold)}.meter.pos i{background:var(--pos)}.meter.neg i{background:var(--neg)}
+.dots{display:flex;gap:5px}
+.dots i{width:16px;height:16px;border-radius:50%;background:var(--sunk);border:1px solid var(--line)}
+.dots i.on{background:var(--pos);border-color:var(--pos)}
+
+/* buttons, chips */
+.btn{border:0;border-radius:99px;padding:10px 18px;font-weight:700;background:var(--brand);color:var(--brand-ink)}
+.btn:hover{filter:brightness(1.07)}
+.btn:disabled{background:var(--sunk);color:var(--muted);cursor:not-allowed;filter:none;box-shadow:inset 0 0 0 1px var(--line)}
+.btn.pos{background:var(--pos);color:#fff}
+.btn.neg{background:var(--neg);color:#fff}
+.btn.ghost{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.sm{padding:7px 13px;font-size:13px}
+.btn.big{padding:13px 22px;font-size:16px}
+.btn.wide{width:100%}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.chip.red{background:var(--neg-soft);color:var(--neg);border-color:transparent}
+.chip.amber{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.chip.green{background:var(--pos-soft);color:var(--pos);border-color:transparent}
+.chip.blue{background:var(--brand-soft);color:var(--brand);border-color:transparent}
+
+/* next / goal / activity */
+.next{padding:16px;display:grid;gap:10px}
+.next .t{font-size:19px;font-weight:800;letter-spacing:-.01em;overflow-wrap:anywhere}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.goal{padding:14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.goal .pct{font-weight:800;font-size:20px}
+.tx{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.tx:last-child{border-bottom:0}
+.tx .nm{font-weight:600;overflow-wrap:anywhere}
+.tx .sub{font-size:12px;color:var(--muted)}
+.amt{font-weight:700;white-space:nowrap}
+.amt.pos{color:var(--pos)}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+
+/* money tab */
+.acct-hero{padding:18px;display:grid;gap:12px}
+.acct-hero .v{font-size:30px;font-weight:800;letter-spacing:-.03em}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.kv b{display:block;font-size:15px}
+.ccwrap{display:grid;gap:12px}
+.cc{border-radius:18px;padding:18px;color:#fff;aspect-ratio:1.62/1;max-width:100%;width:min(100%,380px);display:grid;align-content:space-between;position:relative;overflow:hidden;box-shadow:0 14px 30px -14px rgba(0,0,0,.5)}
+.cc::after{content:"";position:absolute;right:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+.cc .chipgfx{width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#F3D27A,#B8902E);opacity:.9}
+.cc .nmk{font-weight:800;letter-spacing:.02em}
+.cc .nr{font-size:15px;letter-spacing:.14em;font-variant-numeric:tabular-nums;opacity:.9}
+.cc .lo{display:flex;justify-content:space-between;align-items:flex-end;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.cc.frozen::before{content:"FROZEN";position:absolute;inset:0;display:grid;place-items:center;font-weight:800;letter-spacing:.3em;font-size:22px;background:rgba(10,15,28,.55);z-index:2}
+.ccd{padding:16px;display:grid;gap:12px}
+.score{padding:16px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.score svg{width:132px;height:80px}
+.score .sv{font-size:30px;font-weight:800;letter-spacing:-.03em}
+.factors{display:grid;gap:6px;font-size:13px}
+.factors div{display:flex;justify-content:space-between;gap:10px}
+.offer{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.offer:last-child{border-bottom:0}
+
+/* tasks */
+.add{padding:14px;display:grid;gap:10px}
+.add input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--sunk);font-size:16px}
+.fields{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.field{display:grid;gap:4px;flex:1 1 140px;min-width:0}
+.field select,.field input{padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--sunk);width:100%}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.segb{border:1px solid var(--line);background:var(--sunk);border-radius:12px;padding:7px 9px;text-align:left;line-height:1.2}
+.segb b{display:block;font-size:13px}
+.segb span{font-size:12px;color:var(--pos);font-weight:700}
+.segb[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);box-shadow:inset 0 0 0 1px var(--brand)}
+.rules{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
+.group{margin-top:20px}
+.gh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px}
+.gh.overdue h3{color:var(--neg)}.gh.today h3{color:var(--warn)}
+.gh .c{font-size:12px;color:var(--muted);font-weight:600}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}
+.task.over{box-shadow:inset 3px 0 0 var(--neg)}
+.task.leaving{animation:leave .5s ease forwards;pointer-events:none}
+@keyframes leave{0%,45%{opacity:1;transform:none;background:var(--pos-soft)}100%{opacity:0;transform:translateX(40px);background:var(--pos-soft)}}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0}
+.check:hover{border-color:var(--pos)}
+.check svg{width:14px;height:14px;stroke:#fff;opacity:0}
+.task.done .check{background:var(--pos);border-color:var(--pos)}.task.done .check svg{opacity:1}
+.tb2{min-width:0}
+.tt{font-weight:600;overflow-wrap:anywhere}
+.task.done .tt{text-decoration:line-through;color:var(--muted)}
+.tr{display:flex;align-items:center;gap:2px}
+.x{background:none;border:0;color:var(--muted);padding:4px 8px;border-radius:8px;font-size:20px;line-height:1}
+.x:hover{color:var(--neg);background:var(--sunk)}
+details.done summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:13px;margin:20px 0 8px}
+
+/* shop */
+.depts{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.dept{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px 5px 5px;font-weight:700;font-size:13px;white-space:nowrap}
+.dept .ico{width:28px;height:28px;border-radius:50%}.dept .ico svg{width:15px;height:15px}
+.dept[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.subs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.subb{border:1px solid var(--line);border-radius:99px;padding:4px 11px;background:var(--surface);font-weight:600;font-size:13px;color:var(--muted)}
+.subb[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools input,.tools select{padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);flex:1 1 200px;min-width:0}
+.it{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.it:last-child{border-bottom:0}
+.it .nm{font-weight:700;overflow-wrap:anywhere}
+.it .ds{font-size:12px;color:var(--muted)}
+.it .right{display:grid;justify-items:end;gap:6px}
+.it .pr{font-weight:800;white-space:nowrap}
+.heart{background:none;border:0;padding:4px;color:var(--muted)}
+.heart svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.heart[aria-pressed="true"]{color:var(--c-life)}.heart[aria-pressed="true"] svg{fill:currentColor}
+.more{display:flex;justify-content:center;padding:14px}
+.note{font-size:12px;color:var(--muted);margin-top:14px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.listing{overflow:hidden;display:grid;align-content:start}
+.photo{aspect-ratio:4/3;max-width:100%;display:grid;place-items:center;position:relative}
+.photo svg{width:46%;height:auto;fill:none;stroke:rgba(255,255,255,.9);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.photo .ph{position:absolute;bottom:8px;left:8px;font-size:11px;font-weight:700;color:#fff;background:rgba(0,0,0,.35);padding:2px 7px;border-radius:6px}
+.lb{padding:10px 12px 12px;display:grid;gap:4px}
+.lb .p{font-size:18px;font-weight:800}
+.lb .s{font-size:12px;color:var(--muted)}
+.lb .q{font-size:13px;background:var(--sunk);border-radius:8px;padding:6px 8px;margin:4px 0}
+
+/* assets */
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:6px}
+.sum > div{padding:12px 14px}
+.sum .v{font-weight:800;font-size:20px;letter-spacing:-.02em}
+.modtags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(9,14,25,.55);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.scrim[hidden]{display:none!important}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:88%;border-radius:22px 22px 0 0;display:grid;grid-template-rows:auto 1fr;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (min-width:640px){.scrim{align-items:center}.sheet{border-radius:22px}}
+.sheethead{padding:16px 16px 12px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.sheetbody{overflow:auto;padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+.pad{padding:14px 16px;display:grid;gap:12px}
+.payopt{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);text-align:left;width:100%}
+.payopt[aria-pressed="true"]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-soft)}
+.payopt:disabled{opacity:.5;cursor:not-allowed}
+.amtin{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--sunk)}
+.amtin span{font-size:24px;font-weight:800;color:var(--muted)}
+.amtin input{border:0;background:none;font-size:26px;font-weight:800;width:100%;min-width:0;outline:none}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.modgroup{padding:10px 16px 0}
+.spec{display:grid;grid-template-columns:minmax(110px,38%) 1fr;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.spec:last-child{border-bottom:0}
+.spec > span:last-child{min-width:0;overflow-wrap:anywhere;font-weight:600}
+.spec .was{display:block;color:var(--muted);text-decoration:line-through;font-weight:500;font-size:12px}
+.spec .now{color:var(--pos)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}
+
+/* toast + fx */
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--surface);padding:11px 14px;border-radius:14px;display:flex;gap:12px;align-items:center;transition:.25s;z-index:50;max-width:calc(100% - 32px);font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:none;border:0;color:var(--gold);font-weight:800;padding:2px 4px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:45;width:100%;height:100%}
+.float{position:fixed;z-index:46;pointer-events:none;font-weight:800;font-size:22px;color:var(--pos);animation:floatup 1.1s ease-out forwards;transform:translateX(-50%)}
+@keyframes floatup{0%{opacity:0;transform:translate(-50%,0)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
+.banner{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:46;background:var(--navy);color:#fff;border-radius:14px;padding:12px 18px;font-weight:800;font-size:16px;box-shadow:0 12px 30px rgba(0,0,0,.3);animation:ban 2.2s ease forwards;pointer-events:none;white-space:nowrap}
+.banner span{color:var(--gold)}
+@keyframes ban{0%{opacity:0;transform:translate(-50%,-14px)}12%{opacity:1;transform:translate(-50%,0)}85%{opacity:1}100%{opacity:0}}
+.sync{font-size:12px;color:var(--muted);margin-top:26px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:600px){
+  .perks{grid-template-columns:1fr 1fr}.perks .perk:first-child{grid-column:1/-1}
+  .seg{grid-template-columns:1fr 1fr}
+  .it{grid-template-columns:auto 1fr}.it .right{grid-column:1/-1;grid-auto-flow:column;justify-content:space-between;align-items:center;justify-items:start}
+  .task{grid-template-columns:auto 1fr}.tr{grid-column:2;justify-content:space-between}
+  .score{grid-template-columns:1fr;justify-items:start}
+}
+</style>
+</head>
+<body>
+
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#0F1E3D"/><path d="M9 21c3-7 6-10 14-11" stroke="#D9A21B" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="23" cy="10" r="2.6" fill="#D9A21B"/><path d="M9 23h14" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg><div><div class="hi" id="hello">Good evening</div><div class="nm">Bank of Life</div></div></div>
+    <div class="row" style="gap:8px"><span class="lvlpill" id="lvlPill"><i></i>Level 1</span><button class="iconbtn" id="soundBtn" aria-label="Sound"></button></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <!-- HOME -->
+  <section id="v-home">
+    <div class="card nw">
+      <div class="lbl">Net worth</div>
+      <div class="v num" id="nwV">$0</div>
+      <div class="split">
+        <div><div class="lbl">Cash</div><div class="v2 num" id="cashV">$0</div></div>
+        <div><div class="lbl">Assets</div><div class="v2 num" id="assetV">$0</div></div>
+        <div><div class="lbl">Debt</div><div class="v2 num" id="debtV">$0</div></div>
+        <div><div class="lbl">Earned this week</div><div class="v2 num" style="color:var(--pos)" id="wkV">+$0</div></div>
+      </div>
+      <div id="homeAlert"></div>
+    </div>
+    <div class="sec"><div class="sechead"><h2>Accounts</h2><button class="link" data-goto="money">Manage</button></div><div class="card" id="accList"></div></div>
+    <div class="sec perks">
+      <div class="perk card"><div class="row between"><span class="lbl">Level</span><span class="lbl num" id="lvTxt"></span></div><div class="v" id="lvV">Level 1</div><div class="meter gold"><i id="lvBar"></i></div><small id="lvSub"></small></div>
+      <div class="perk card"><span class="lbl">Streak</span><div class="v" id="stV">0 days</div><small id="stSub"></small></div>
+      <div class="perk card"><span class="lbl">Daily goal</span><div class="dots" id="dots"></div><small id="dgSub"></small></div>
+    </div>
+    <div class="sec" id="nextWrap"></div>
+    <div class="sec" id="goalWrap"></div>
+    <div class="sec"><div class="sechead"><h2>Recent activity</h2><button class="link" data-goto="activity">See all</button></div><div class="card" id="txHome"></div></div>
+  </section>
+
+  <!-- MONEY -->
+  <section id="v-money" hidden>
+    <div class="sechead"><h1>Money</h1></div>
+    <div id="moneyAlert"></div>
+    <div class="sec"><div class="sechead"><h2>Checking</h2><span class="lbl">Task payouts land here</span></div>
+      <div class="card acct-hero"><div class="row between"><div><div class="lbl">Available balance</div><div class="v num" id="chkV">$0</div></div><div class="row" style="gap:8px"><button class="btn sm ghost" data-act="transfer" data-dir="toSav">Move to savings</button></div></div></div></div>
+    <div class="sec"><div class="sechead"><h2>Savings</h2><span class="chip green" id="apyChip">5.00% APY</span></div>
+      <div class="card acct-hero"><div class="row between"><div><div class="lbl">Balance</div><div class="v num" id="savV">$0</div></div><div class="row" style="gap:8px"><button class="btn sm ghost" data-act="transfer" data-dir="toChk">Move to checking</button><button class="btn sm" data-act="transfer" data-dir="toSav">Add money</button></div></div>
+      <div class="kv"><div><span class="lbl">Interest earned</span><b class="num" id="intV">$0</b></div><div><span class="lbl">Earns per day</span><b class="num" id="perDayV">$0</b></div><div><span class="lbl">Can't be spent directly</span><b>Move it to checking first</b></div></div></div></div>
+    <div class="sec"><div class="sechead"><h2>Credit score</h2></div><div class="card score" id="scoreBox"></div></div>
+    <div class="sec"><div class="sechead"><h2>Credit cards</h2></div><div id="cardList" class="ccwrap"></div></div>
+    <div class="sec"><div class="sechead"><h2>Card offers</h2><span class="lbl">Better cards unlock with score and level</span></div><div class="card" id="offers"></div></div>
+    <p class="note">Card interest is charged daily. A minimum payment is due every 7 days. Miss it and you pay a late fee, your score drops, the card freezes, and half of every task payout goes to the card until you're caught up.</p>
+    <div class="sec"><div class="sechead"><h2>Backup &amp; restore</h2></div>
+      <div class="card pad">
+        <span class="lbl">Copy a backup code to move your progress between this page and the phone app, or to another device.</span>
+        <div class="row" style="gap:8px"><button class="btn sm" data-act="backup">Copy backup code</button><button class="btn sm ghost" data-act="savebackup" id="saveBackupBtn" hidden>Save backup file</button></div>
+        <label class="lbl" for="bkText">Restore from a backup code</label>
+        <textarea id="bkText" rows="3" placeholder="Paste a backup code here" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--sunk);font:inherit;font-size:13px;resize:vertical"></textarea>
+        <div class="row"><button class="btn sm ghost" data-act="restore" id="restoreBtn">Restore</button></div>
+      </div></div>
+  </section>
+
+  <!-- TASKS -->
+  <section id="v-tasks" hidden>
+    <div class="sechead"><h1>Tasks</h1></div>
+    <form class="add card" id="addForm" autocomplete="off">
+      <input type="text" id="f-title" placeholder="What do you need to get done?" maxlength="140" required>
+      <div class="seg" id="sizes"></div>
+      <div class="fields">
+        <label class="field"><span class="lbl">Due date</span><input type="date" id="f-due"></label>
+        <label class="field"><span class="lbl">Type</span><select id="f-cat"><option>School</option><option>Submit / Turn in</option><option>Pay off</option><option>Work</option><option>Personal</option><option>Goal</option></select></label>
+        <button class="btn" type="submit">Add task</button>
+      </div>
+    </form>
+    <div class="rules"><span class="chip green">Early +10%</span><span class="chip">On due date: full pay</span><span class="chip red">Late: half pay</span><span class="chip blue">Streak +2%/day, max +20%</span><span class="chip">Each level +1%</span><span class="chip green">3 a day: +$5K</span></div>
+    <div id="taskList"></div>
+  </section>
+
+  <!-- SHOP -->
+  <section id="v-shop" hidden>
+    <div class="sechead"><h1>Shop</h1><span class="lbl num" id="shopBal"></span></div>
+    <div class="depts" id="depts"></div>
+    <div class="subs" id="subs"></div>
+    <div class="tools" id="tools">
+      <input type="search" id="q" placeholder="Search everything: 4Runner, G700, Malibu, engraved…" aria-label="Search the shop">
+      <select id="sort" aria-label="Sort"><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option><option value="afford">I can afford it</option></select>
+    </div>
+    <div id="shopList"></div>
+    <div class="more" id="moreBox"></div>
+    <p class="note">Prices are approximate 2025–26 U.S. retail or typical market value. Classics, props, art and one-offs use recent sale or auction prices. Custom builds and installs are typical build costs. Staff are one-year contracts.</p>
+  </section>
+
+  <!-- ASSETS -->
+  <section id="v-assets" hidden>
+    <div class="sechead"><h1>Assets</h1></div>
+    <div class="sum" id="sum"></div>
+    <div id="assetList"></div>
+  </section>
+
+  <!-- ACTIVITY -->
+  <section id="v-activity" hidden>
+    <div class="sechead"><h1>Activity</h1><button class="link" data-goto="home">Back</button></div>
+    <div class="card" id="txAll"></div>
+  </section>
+  <p class="sync" id="sync"></p>
+</main>
+
+<nav class="tabbar" role="tablist"><div class="in">
+  <button class="tb" role="tab" data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Home</button>
+  <button class="tb" role="tab" data-tab="tasks" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg>Tasks<span class="n" id="n-tasks" hidden></span></button>
+  <button class="tb" role="tab" data-tab="money" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Money<span class="n" id="n-money" hidden>!</span></button>
+  <button class="tb" role="tab" data-tab="shop" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Shop</button>
+  <button class="tb" role="tab" data-tab="assets" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/></svg>Assets</button>
+</div></nav>
+
+<div class="scrim" id="scrim" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheethead" id="sheetHead"></div><div class="sheetbody" id="sheetBody"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button id="toastUndo" hidden>Undo</button></div>
+
+<script>
+(() => {
+// ======================= ECONOMY
+const PAY = {quick:1000, standard:4000, big:20000, major:100000, huge:500000, massive:2500000, monumental:10000000, lifechanging:50000000};
+const MAX_LVL = 250, LVL_BONUS = .01, STREAK_BONUS = .02, STREAK_CAP = 10, EARLY = 1.10;
+const SIZES = [["quick","Quick","~15 min"],["standard","Standard","~1 hour"],["big","Big","a real push"],["major","Major goal","weeks"],["huge","Huge","a month or two"],["massive","Massive","a semester"],["monumental","Monumental","a year"],["lifechanging","Life-changing","years"]];
+const SIZE_LABEL = Object.fromEntries(SIZES.map(s => [s[0], s[1]]));
+const DAILY_GOAL = 3, DAILY_BONUS = 5000, SELL_RATE = 0.8, SAV_APY = 0.05, GARNISH = 0.5;
+const lvlNeed = n => Math.round(40000 * Math.pow(n - 1, 2.3));
+const levelOf = xp => { let n = 1; while (n < MAX_LVL && xp >= lvlNeed(n + 1)) n++; return n; };
+const CARDS = [
+  {t:"starter",  name:"Life Card",          limit:5000,     apr:.2999, score:0,   lvl:1,  bg:"linear-gradient(135deg,#3A4A63,#1C2537)"},
+  {t:"gold",     name:"Life Gold",          limit:50000,    apr:.2699, score:680, lvl:3,  bg:"linear-gradient(135deg,#C99A2E,#7A5A12)"},
+  {t:"platinum", name:"Life Platinum",      limit:500000,   apr:.2499, score:720, lvl:10,  bg:"linear-gradient(135deg,#9AA4B5,#4C5566)"},
+  {t:"black",    name:"Life Black",         limit:5000000,  apr:.2299, score:760, lvl:25,  bg:"linear-gradient(135deg,#2A2A2E,#050507)"},
+  {t:"obsidian", name:"Life Obsidian",      limit:50000000, apr:.1999, score:800, lvl:50, bg:"linear-gradient(135deg,#3B1E5E,#0B0518)"}
+];
+const CARD = Object.fromEntries(CARDS.map(c => [c.t, c]));
+
+// ======================= ICONS (24px line)
+const I = {
+  car:'<path d="M3 16v-3l2.2-4.4A2 2 0 0 1 7 7.5h10a2 2 0 0 1 1.8 1.1L21 13v3"/><path d="M3 16h18v2H3z"/><circle cx="7.5" cy="16" r="1.6"/><circle cx="16.5" cy="16" r="1.6"/><path d="M5 12h14"/>',
+  truck:'<path d="M2 15V8h11v7"/><path d="M13 10h4l4 3v2"/><path d="M2 15h19"/><circle cx="6" cy="16.5" r="2.2"/><circle cx="17" cy="16.5" r="2.2"/><path d="M4 8V5h6v3"/>',
+  tag:'<path d="M3 12V4h8l9 9-8 8z"/><circle cx="7.5" cy="8" r="1.5"/>',
+  pistol:'<path d="M3 7h17v4h-9l-1.5 7H6l1.5-7H3z"/><path d="M11 11c0 2 1 2.5 2.5 2"/>',
+  rifle:'<path d="M2 11h12v2H2z"/><path d="M12 10h5l5 2v4l-4-1-2-2h-4"/><path d="M8 13l-1 4"/>',
+  house:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  building:'<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/>',
+  plane:'<path d="M2 13l7-1 4-7h2l-2 7 6-1 2-2h1l-1 4 1 4h-1l-2-2-6-1 2 7h-2l-4-7-7-1z"/>',
+  heli:'<path d="M3 5h16M11 5v3"/><path d="M5 12a6 4 0 0 1 12 0v3H7a2 2 0 0 1-2-2z"/><path d="M17 12h5M8 19h8M10 15v4M14 15v4"/>',
+  yacht:'<path d="M2 16h20l-3 4H5z"/><path d="M5 16l2-4h10l3 4"/><path d="M8 12l2-3h4l1 3"/>',
+  island:'<path d="M2 19c3-2 6-2 9 0s6 2 9 0"/><path d="M6 17c2-3 8-3 12 0"/><path d="M12 16V7"/><path d="M12 7c-2-2-5-1-6 1M12 7c2-2 5-1 6 1M12 7c0-2 1-3 3-3"/>',
+  card:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M9 17h6"/>',
+  wine:'<path d="M8 3h8l-.5 5a3.5 3.5 0 0 1-7 0z"/><path d="M12 12v7M8 21h8"/>',
+  horse:'<path d="M5 20v-6l3-5-2-3 4 1 6-2 3 4-2 1-2-1-1 4 1 7"/><path d="M9 20v-5"/>',
+  chef:'<path d="M7 14a4 4 0 0 1-.5-7.9A4.5 4.5 0 0 1 12 3a4.5 4.5 0 0 1 5.5 3.1A4 4 0 0 1 17 14"/><path d="M7 14h10v6H7z"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  shield:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/>',
+  gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 6 3-6M12 9v12"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5L17 4l3 3-2.5 2.5"/>',
+  check:'<path d="M5 12l5 5 9-10"/>',
+  bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  bonus:'<path d="M12 3v18M7 8h7.5a3 3 0 0 1 0 6H8.5a3 3 0 0 0 0 6H17"/>',
+  sell:'<path d="M3 12h13M12 7l5 5-5 5"/><path d="M20 4v16"/>',
+  fish:'<path d="M3 12c4-5 10-5 14 0-4 5-10 5-14 0z"/><path d="M17 12l4-3v6z"/><circle cx="7" cy="11" r="1"/>',
+  music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  brush:'<rect x="4" y="4" width="16" height="13" rx="1"/><path d="M4 14l4-4 4 4 3-3 5 5"/><circle cx="15" cy="8" r="1.5"/><path d="M10 21h4M12 17v4"/>',
+  game:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="16" cy="11.5" r=".8"/><circle cx="18" cy="13.5" r=".8"/>',
+  moon:'<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/><circle cx="9" cy="14" r="1.2"/><circle cx="13" cy="17" r=".8"/>',
+  figure:'<circle cx="12" cy="5" r="2.5"/><path d="M8 21l1-7-3-1 2-5h8l2 5-3 1 1 7"/><path d="M6 21h12"/>',
+  rocket:'<path d="M12 3c4 2 6 6 5 11l-3 3h-4l-3-3c-1-5 1-9 5-11z"/><circle cx="12" cy="10" r="2"/><path d="M9 17l-2 4M15 17l2 4"/>'
+};
+const svg = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${I[k] || I.star}</svg>`;
+
+// ======================= CATALOG
+// rows: [id, name, detail, price, subcategory, icon?]
+const DEPTS = [
+  {k:"Cars", c:"--c-cars", i:"car", mods:["car"], subs:["JDM","USDM","Euro","Luxury","Super","Hyper","Classics","Movie & one-offs"]},
+  {k:"Off-Road", c:"--c-off", i:"truck", mods:["offroad","car"], subs:["Overland","Prerunners","Trophy & race","UTVs"]},
+  {k:"Guns", c:"--c-guns", i:"pistol", mods:["gun"], subs:["Handguns","Rifles","Precision bolt","Shotguns","Custom & engraved","Collector"]},
+  {k:"Homes", c:"--c-homes", i:"house", mods:["home"], subs:["San Diego","California","West & Mountain","Texas & South","East & Midwest","International"]},
+  {k:"Aircraft", c:"--c-air", i:"plane", mods:["air"], subs:["Light jets","Midsize jets","Heavy jets","Airliners","Helicopters","Props & warbirds"]},
+  {k:"Yachts & Islands", c:"--c-sea", i:"yacht", mods:["sea"], subs:["Boats","Yachts","Superyachts","Private islands"]},
+  {k:"Lifestyle", c:"--c-life", i:"trophy", mods:[], subs:["Memberships","Hobbies & racing","Wine & dining","Experiences"]},
+  {k:"Staff", c:"--c-staff", i:"user", mods:[], subs:["Household","Culinary","Security & travel","Advisors"]},
+  {k:"Novelty", c:"--c-nov", i:"gem", mods:[], subs:["Movie & TV props","Anime & games","Art & comics","Music","Statues & figures","Space & moon","Jewelry & watches","Bespoke objects","Collectibles","Wild"]},
+  {k:"Marketplace", c:"--c-mkt", i:"tag", mods:["car","offroad"], subs:[], hidden:true}
+];
+const DEPT = Object.fromEntries(DEPTS.map(d => [d.k, d]));
+const RAW = {
+"Cars": [
+ ["civicsi","Honda Civic Si","200 hp turbo, 6-speed",30000,"JDM"],["miata","Mazda MX-5 Miata RF","2.0L roadster",30000,"JDM"],["gr86","Toyota GR86","2.4L flat-four",31000,"JDM"],["brz","Subaru BRZ tS","Track-tuned twin of the 86",38000,"JDM"],["wrx","Subaru WRX","2.4L turbo AWD",34000,"JDM"],["grcor","Toyota GR Corolla","300 hp, AWD hatch",40000,"JDM"],["nz","Nissan Z","400 hp twin-turbo V6",43000,"JDM"],["ctr","Honda Civic Type R","315 hp FL5",46000,"JDM"],["integras","Acura Integra Type S","320 hp, 6-speed",53000,"JDM"],["supra","Toyota GR Supra 3.0","382 hp inline-six",58000,"JDM"],["znismo","Nissan Z Nismo","420 hp",66000,"JDM"],["rcf","Lexus RC F","5.0L V8 coupe",70000,"JDM"],["lc500","Lexus LC 500","5.0L V8 GT",101000,"JDM"],["gtr","Nissan GT-R Nismo","600 hp, final year",222000,"JDM"],["lfa","Lexus LFA","V10, 500 built",900000,"JDM"],
+ ["s13","Nissan 240SX (S13)","Drift-ready classic",22000,"JDM"],["fc","Mazda RX-7 FC","Rotary, 1986–1992",25000,"JDM"],["3000gt","Mitsubishi 3000GT VR-4","Twin-turbo AWD",30000,"JDM"],["jzx100","Toyota Chaser JZX100","1JZ, JDM import",40000,"JDM"],["ae86","Toyota AE86 Trueno","The tofu car",45000,"JDM"],["s15","Nissan Silvia S15 Spec-R","SR20DET import",45000,"JDM"],["r32","Nissan Skyline GT-R R32","RB26 'Godzilla'",55000,"JDM"],["evo9","Mitsubishi Lancer Evo IX MR","4G63 AWD",60000,"JDM"],["dc2","Acura Integra Type R (DC2)","B18C5, 1997–2001",60000,"JDM"],["fd","Mazda RX-7 FD","Twin-rotor, sequential turbos",65000,"JDM"],["r33","Nissan Skyline GT-R R33","RB26, import",75000,"JDM"],["s2kcr","Honda S2000 CR","Club Racer, 9k rpm",85000,"JDM"],["nsx1","Honda NSX (NA1)","Mid-engine classic",110000,"JDM"],["mk4","Toyota Supra MK4 Turbo","2JZ-GTE, 6-speed",120000,"JDM"],["nsxs","Acura NSX Type S","600 hp hybrid, final run",170000,"JDM"],["r34","Nissan Skyline GT-R R34 V-Spec","RB26, Bayside Blue",200000,"JDM"],["22b","Subaru Impreza 22B STi","424 built",300000,"JDM"],
+ ["mustang","Ford Mustang EcoBoost","2.3L turbo",33000,"USDM"],["mgt","Ford Mustang GT","5.0L Coyote V8",46000,"USDM"],["camss","Chevrolet Camaro SS","6.2L V8",50000,"USDM"],["daytona","Dodge Charger Daytona Scat Pack","670 hp electric",60000,"USDM"],["dh","Ford Mustang Dark Horse","500 hp",62000,"USDM"],["stingray","Chevrolet Corvette Stingray","Mid-engine, 495 hp",70000,"USDM"],["zl1","Chevrolet Camaro ZL1","650 hp supercharged",75000,"USDM"],["gt500","Ford Shelby GT500","760 hp, 2020–2022",85000,"USDM"],["redeye","Dodge Challenger Hellcat Redeye","797 hp",85000,"USDM"],["plaid","Tesla Model S Plaid","1,020 hp",95000,"USDM"],["blackwing","Cadillac CT5-V Blackwing","668 hp, manual",95000,"USDM"],["hummer","GMC Hummer EV SUV","1,000 hp, crab walk",98000,"USDM"],["cyber","Tesla Cybertruck Cyberbeast","845 hp",100000,"USDM"],["eray","Chevrolet Corvette E-Ray","AWD hybrid",108000,"USDM"],["z06","Chevrolet Corvette Z06","670 hp flat-plane V8",112000,"USDM"],["escv","Cadillac Escalade-V","682 hp SUV",155000,"USDM"],["zr1","Chevrolet Corvette ZR1","1,064 hp twin-turbo",175000,"USDM"],["viper","Dodge Viper ACR","8.4L V10, 2017",230000,"USDM"],["fordgt","Ford GT","660 hp carbon chassis",1100000,"USDM"],
+ ["gti","Volkswagen Golf GTI","241 hp hatch",33000,"Euro"],["golfr","Volkswagen Golf R","315 hp AWD",47000,"Euro"],["rs3","Audi RS 3","5-cyl turbo",63000,"Euro"],["macan","Porsche Macan","Electric SUV",80000,"Euro"],["m2","BMW M2","473 hp, manual",65000,"Euro"],["m3","BMW M3 Competition","503 hp",85000,"Euro"],["c63","Mercedes-AMG C 63 S","671 hp hybrid",85000,"Euro"],["giulia","Alfa Romeo Giulia Quadrifoglio","505 hp, Ferrari-derived V6",95000,"Euro"],["m5","BMW M5","717 hp hybrid V8",120000,"Euro"],["rs6","Audi RS 6 Avant","621 hp wagon",125000,"Euro"],["carrera","Porsche 911 Carrera","Base 911",125000,"Euro"],["m4csl","BMW M4 CSL","Lightweight, 543 hp",140000,"Euro"],["rsgt","Audi RS e-tron GT Performance","912 hp",170000,"Euro"],["g63","Mercedes-AMG G 63","The G-Wagon",185000,"Euro"],["vantage","Aston Martin Vantage","656 hp",195000,"Euro"],["cayturbo","Porsche Cayenne Turbo GT","650 hp SUV",200000,"Euro"],["taycan","Porsche Taycan Turbo S","938 hp",210000,"Euro"],["bentayga","Bentley Bentayga Speed","W12 SUV",230000,"Euro"],["rrsv","Range Rover SV","Twin-turbo V8",230000,"Euro"],["turbos","Porsche 911 Turbo S","0–60 in 2.2s",240000,"Euro"],["gt3rs","Porsche 911 GT3 RS","Track monster",245000,"Euro"],["db12","Aston Martin DB12","671 hp",250000,"Euro"],["contgt","Bentley Continental GT Speed","771 hp hybrid",305000,"Euro"],["brabus","Brabus G 800","800 hp G-Wagon",350000,"Euro"],["ghost","Rolls-Royce Ghost","V12 sedan",350000,"Euro"],["cullinan","Rolls-Royce Cullinan","V12 SUV",400000,"Euro"],["spectre","Rolls-Royce Spectre","Electric coupe",425000,"Euro"],["phantom","Rolls-Royce Phantom","The flagship",470000,"Euro"],
+ ["lm","Lexus LM 350h","4-seat VIP limo-van",110000,"Luxury"],["century","Toyota Century SUV","Japan's chauffeur flagship",170000,"Luxury"],["mbgls","Mercedes-Maybach GLS 600","Two-tone, champagne fridge",180000,"Luxury"],["mbeqs","Mercedes-Maybach EQS 680 SUV","Electric Maybach",180000,"Luxury"],["mbsl","Mercedes-Maybach SL 680 Monogram","Two-seat Maybach roadster",230000,"Luxury"],["mbs680","Mercedes-Maybach S 680","V12, rear recliners",240000,"Luxury"],["bentewb","Bentley Bentayga EWB Mulliner","Airline seats in back",260000,"Luxury"],["spurm","Bentley Flying Spur Mulliner","W12 send-off",280000,"Luxury"],["dawn","Rolls-Royce Dawn","V12 convertible",380000,"Luxury"],["wraithbb","Rolls-Royce Wraith Black Badge","Final-year V12 coupe",400000,"Luxury"],["cullbb","Rolls-Royce Cullinan Black Badge","Blacked-out V12 SUV",450000,"Luxury"],["slr","Mercedes-Benz SLR McLaren","Coupe, 2004–2009",450000,"Luxury"],["spectrebb","Rolls-Royce Spectre Black Badge","659 hp electric",500000,"Luxury"],["slrrd","Mercedes-Benz SLR McLaren Roadster","Supercharged V8",500000,"Luxury"],["rocket900","Brabus Rocket 900","S-Class, 888 hp, 10 built",530000,"Luxury"],["phantomewb","Rolls-Royce Phantom Extended","Starlight, Gallery dash",560000,"Luxury"],["rocket1000","Brabus Rocket 1000","AMG GT, 1,000 hp hybrid",600000,"Luxury"],["venatus","Mansory Venatus (Urus)","Forged carbon widebody",600000,"Luxury"],["mansbent","Mansory Bentayga Coupé","Two-door conversion",600000,"Luxury"],["brabus900","Brabus 900 Superblack","G-Wagon, 900 hp V12",700000,"Luxury"],["manscull","Mansory Coastline Cullinan","Full carbon, 1-of-few",800000,"Luxury"],["gronos","Mansory Gronos G 63","Carbon body, 850 hp",900000,"Luxury"],["mansf9","Mansory F9XX (SF90)","1,100 hp, 7 built",1200000,"Luxury"],["slr722","Mercedes-Benz SLR 722 Edition","650 hp, 150 built",1200000,"Luxury"],["landaulet","Mercedes-Maybach G 650 Landaulet","Convertible, 99 built",1200000,"Luxury"],["batur","Bentley Batur","Mulliner coachbuilt, 18 made",2000000,"Luxury"],["bacalar","Bentley Bacalar","Roofless barchetta, 12 made",2000000,"Luxury"],["slrmoss","Mercedes-Benz SLR Stirling Moss","Speedster, 75 built",3500000,"Luxury"],["exelero","Maybach Exelero","One-off, 700 hp",8000000,"Luxury"],["droptail","Rolls-Royce La Rose Noire Droptail","Coachbuilt, 4 made",30000000,"Luxury"],
+ ["mc20","Maserati MC20","621 hp V6",240000,"Super"],["artura","McLaren Artura","Hybrid V6",250000,"Super"],["r8","Audi R8 GT","Final V10",250000,"Super"],["roma","Ferrari Roma Spider","612 hp V8",265000,"Super"],["urus","Lamborghini Urus SE","789 hp hybrid SUV",260000,"Super"],["750s","McLaren 750S","740 hp V8",330000,"Super"],["temerario","Lamborghini Temerario","907 hp hybrid V8",330000,"Super"],["sto","Lamborghini Huracán STO","Race car for the street",330000,"Super"],["296","Ferrari 296 GTB","819 hp hybrid V6",335000,"Super"],["purosangue","Ferrari Purosangue","V12 four-door",400000,"Super"],["amgbs","Mercedes-AMG GT Black Series","720 hp",400000,"Super"],["12cil","Ferrari 12Cilindri","819 hp V12",425000,"Super"],["sf90","Ferrari SF90 Stradale","986 hp",525000,"Super"],["svj","Lamborghini Aventador SVJ","770 hp V12",600000,"Super"],["revuelto","Lamborghini Revuelto","1,001 hp V12 hybrid",610000,"Super"],["812c","Ferrari 812 Competizione","819 hp V12",800000,"Super"],
+ ["gemera","Koenigsegg Gemera","4-seat hypercar",1700000,"Hyper"],["p1","McLaren P1","903 hp hybrid",1700000,"Hyper"],["918","Porsche 918 Spyder","Hybrid V8",1800000,"Hyper"],["tuatara","SSC Tuatara","1,750 hp on E85",2000000,"Hyper"],["w1","McLaren W1","1,258 hp",2100000,"Hyper"],["nevera","Rimac Nevera","1,914 hp electric",2200000,"Hyper"],["battista","Pininfarina Battista","1,900 hp electric",2200000,"Hyper"],["sp3","Ferrari Daytona SP3","V12 Icona",2200000,"Hyper"],["speedtail","McLaren Speedtail","250 mph three-seater",2500000,"Hyper"],["amgone","Mercedes-AMG ONE","F1 engine on the street",2700000,"Hyper"],["venom","Hennessey Venom F5","1,817 hp",3000000,"Hyper"],["jesko","Koenigsegg Jesko","1,600 hp",3000000,"Hyper"],["regera","Koenigsegg Regera","Direct drive hybrid",3000000,"Hyper"],["t50","Gordon Murray T.50","Fan car, manual V12",3100000,"Hyper"],["utopia","Pagani Utopia","V12, manual",3100000,"Hyper"],["huayrar","Pagani Huayra R","Track-only V12",3100000,"Hyper"],["valkyrie","Aston Martin Valkyrie","Cosworth V12",3500000,"Hyper"],["sian","Lamborghini Sián","63 built",3600000,"Hyper"],["chiron","Bugatti Chiron Super Sport","1,578 hp W16",3900000,"Hyper"],["f80","Ferrari F80","1,200 hp",3900000,"Hyper"],["laferrari","Ferrari LaFerrari","Hybrid V12",4000000,"Hyper"],["tourbillon","Bugatti Tourbillon","V16 hybrid",4100000,"Hyper"],["bolide","Bugatti Bolide","Track-only W16",4400000,"Hyper"],
+ ["bus","Volkswagen 21-window Bus","1960s Samba",150000,"Classics"],["etype","Jaguar E-Type Series 1","1961–1968",150000,"Classics"],["z28","Chevrolet Camaro Z/28","1969, DZ 302",120000,"Classics"],["chevelle","Chevrolet Chevelle SS 454 LS6","1970",150000,"Classics"],["splitwin","Chevrolet Corvette Split-Window","1963",150000,"Classics"],["bronco66","Ford Bronco (1st gen)","1966–1977, original",90000,"Classics"],["gnx","Buick GNX","1987, 547 built",200000,"Classics"],["shelby67","Shelby GT500","1967 fastback",250000,"Classics"],["cuda","Plymouth Hemi 'Cuda","1970, 426 Hemi",400000,"Classics"],["toyota2000","Toyota 2000GT","1967, 351 built",1000000,"Classics"],["gullwing","Mercedes 300 SL Gullwing","1954–1957",1500000,"Classics"],["959","Porsche 959","1986 tech monster",1800000,"Classics"],["cobra","Shelby Cobra 427","1965 original",2500000,"Classics"],["f40","Ferrari F40","1987–1992",3000000,"Classics"],["miura","Lamborghini Miura SV","1971",3000000,"Classics"],["gt40","Ford GT40 Mk I","1960s Le Mans era",9000000,"Classics"],["mclf1","McLaren F1","1990s, center seat",20000000,"Classics"],["250gto","Ferrari 250 GTO","1962, 36 built",70000000,"Classics"],["uhlenhaut","Mercedes 300 SLR Uhlenhaut Coupé","Most expensive car ever sold",143000000,"Classics"],
+ ["generallee","'General Lee' Dodge Charger","Screen-used, 1969",450000,"Movie & one-offs","film"],["ffsupra","Fast & Furious Toyota Supra","Screen-used, orange",550000,"Movie & one-offs","film"],["eleanor","'Eleanor' Mustang (Gone in 60 Seconds)","Screen-used",1000000,"Movie & one-offs","film"],["batmobile92","1992 Batmobile (Batman Returns)","Screen-used prop car",1500000,"Movie & one-offs","film"],["delorean","Time-machine DeLorean","Screen-used prop",1500000,"Movie & one-offs","film"],["bullitt","Bullitt Mustang GT","Original 1968 hero car",3700000,"Movie & one-offs","film"],["batmobile89","1989 Batmobile","Screen-used, Batman (1989)",1500000,"Movie & one-offs","film"],["batmobile66","1966 Batmobile","The original TV car",4600000,"Movie & one-offs","film"],["db5","James Bond Aston Martin DB5","Goldfinger promo car",6400000,"Movie & one-offs","film"],["noire","Bugatti La Voiture Noire","One-off",18700000,"Movie & one-offs"],["boattail","Rolls-Royce Boat Tail","Coachbuilt, 3 made",28000000,"Movie & one-offs"]
+],
+"Off-Road": [
+ ["4r","Toyota 4Runner TRD Pro, 6\" lift on 35s","Bumpers, sliders, roof rack",75000,"Overland"],["4r2j","Toyota 4Runner, 2JZ swap, 37s","SEMA-style show build",160000,"Overland"],["lc80","Land Cruiser 80 Series","4\" lift, triple lockers",85000,"Overland"],["lc70","Land Cruiser 70 pickup","Australian import, diesel",90000,"Overland"],["gladiator","Jeep Gladiator Mojave","3.5\" lift on 40s",90000,"Overland"],["pw","Ram 2500 Power Wagon","6\" lift, 40s, winch",110000,"Overland"],["broncor","Ford Bronco Raptor","40s on beadlocks",110000,"Overland"],["cybercustom","Tesla Cybertruck, lifted on 37s","Custom wheels, light bar",130000,"Overland"],["h1","Hummer H1 Alpha","Duramax, lifted",180000,"Overland"],["k5","Chevy K5 Blazer restomod","LS3, Fox shocks",180000,"Overland"],["bronco1","1st-gen Bronco restomod","Coyote V8, modern everything",250000,"Overland"],["g4x4","Mercedes G 550 4x4²","Portal axles",250000,"Overland"],["xlp","Brabus 800 XLP","800 hp G-Class pickup",600000,"Overland"],
+ ["tacotrd","Toyota Tacoma TRD Pro on 37s","Long-travel front",70000,"Prerunners"],["tacocummins","Tacoma, Cummins diesel swap","Torque for days",120000,"Prerunners"],["raptorlt","Ford Raptor R, long travel","Whipple-boosted 900 hp",220000,"Prerunners"],["tacolt","Tacoma prerunner, long travel","Twin-turbo LS, 750 hp",250000,"Prerunners"],["taco1200","Tacoma prerunner, 1,200 hp","Twin-turbo LS, 4-link rear, bypass shocks",450000,"Prerunners"],["trxlt","Ram TRX prerunner","Full long travel, 900 hp",300000,"Prerunners"],
+ ["ultra4","King of the Hammers Ultra4 car","Rock and desert racer",300000,"Trophy & race"],["class6100","Class 6100 race truck","Spec trophy-lite",500000,"Trophy & race"],["tt","Trophy truck","Baja 1000-ready, 900 hp",1200000,"Trophy & race"],["tt2","Trophy truck with chase team","Truck, chase rigs, crew for a season",2500000,"Trophy & race"],
+ ["rzr","Polaris RZR Pro R Ultimate","225 hp UTV",42000,"UTVs"],["mavr","Can-Am Maverick R","240 hp UTV",50000,"UTVs"],["yxz","Yamaha YXZ1000R SS","Sequential, 3-cyl",25000,"UTVs"],["sandrail","Custom dune sand rail","LS-powered, 4-seat",120000,"UTVs"]
+],
+"Guns": [
+ ["mp9","Smith & Wesson M&P9 2.0","9mm full-size",500,"Handguns"],["g43x","Glock 43X","9mm slim",500,"Handguns"],["g17","Glock 17 Gen 5","9mm full-size",550,"Handguns"],["g19","Glock 19 Gen 5","9mm compact",550,"Handguns"],["hellcat","Springfield Hellcat","9mm micro",550,"Handguns"],["p365","Sig Sauer P365","9mm carry",600,"Handguns"],["xmacro","Sig Sauer P365 XMacro","17+1, 9mm",650,"Handguns"],["m18","Sig Sauer M18","9mm, service style",700,"Handguns"],["pdp","Walther PDP","9mm, optics ready",700,"Handguns"],["b92","Beretta 92FS","9mm classic",750,"Handguns"],["vp9","HK VP9","9mm",800,"Handguns"],["cz75","CZ 75 SP-01","9mm all-steel",900,"Handguns"],["kimber","Kimber Custom II",".45 ACP 1911",1000,"Handguns"],["m29","Smith & Wesson Model 29",".44 Magnum",1100,"Handguns"],["usp","HK USP",".45 ACP",1100,"Handguns"],["shadow","CZ Shadow 2","9mm competition",1300,"Handguns"],["p226","Sig Sauer P226 Legion","9mm",1400,"Handguns"],["57","FN Five-seveN","5.7x28",1400,"Handguns"],["python","Colt Python",".357 Magnum",1500,"Handguns"],["prodigy","Springfield Prodigy","9mm 2011",1500,"Handguns"],["sw500","Smith & Wesson Model 500",".500 S&W Magnum",1600,"Handguns"],["deagle","Magnum Research Desert Eagle",".50 AE",2000,"Handguns"],["staccato","Staccato P","9mm 2011",2500,"Handguns"],["staccatoxc","Staccato XC","Comp'd 2011",3500,"Handguns"],["nighthawk","Nighthawk Custom GRP","Hand-fit 1911",3800,"Handguns"],["edcx9","Wilson Combat EDC X9","9mm custom",4000,"Handguns"],["korth","Korth Mongoose",".357, German revolver",4000,"Handguns"],
+ ["1022","Ruger 10/22",".22 LR",350,"Rifles","rifle"],["henry","Henry Big Boy","Lever action",1000,"Rifles","rifle"],["6920","Colt LE6920","5.56 AR-15",1200,"Rifles","rifle"],["marlin","Marlin 1895 SBL",".45-70 lever",1400,"Rifles","rifle"],["bcm","BCM Recce-16","5.56",1700,"Rifles","rifle"],["dd","Daniel Defense DDM4 V7","5.56",1900,"Rifles","rifle"],["geissele","Geissele Super Duty","5.56",1900,"Rifles","rifle"],["m1a","Springfield M1A",".308",1900,"Rifles","rifle"],["spear","Sig MCX Spear LT","5.56 / 7.62x39",2500,"Rifles","rifle"],["scar16","FN SCAR 16S","5.56",3500,"Rifles","rifle"],["mr556","HK MR556","5.56",3500,"Rifles","rifle"],["scar17","FN SCAR 17S",".308",3800,"Rifles","rifle"],["mr762","HK MR762",".308",4500,"Rifles","rifle"],
+ ["ruamer","Ruger American Predator","Bolt, 6.5 CM",550,"Precision bolt","rifle"],["tikka","Tikka T3x Lite","Bolt hunting rifle",800,"Precision bolt","rifle"],["bergara","Bergara B14 HMR","6.5 Creedmoor",1200,"Precision bolt","rifle"],["mesa","Christensen Arms Mesa","Carbon fiber stock",1300,"Precision bolt","rifle"],["rpr","Ruger Precision Rifle","Chassis bolt",1700,"Precision bolt","rifle"],["savelite","Savage 110 Elite Precision","MDT chassis",2000,"Precision bolt","rifle"],["krg","Custom KRG chassis 6.5 Creedmoor","Proof barrel, custom action",5000,"Precision bolt","rifle"],["srs","Desert Tech SRS-A2 Covert","Bullpup bolt",5500,"Precision bolt","rifle"],["zermatt","Custom Zermatt Origin build",".300 PRC, carbon barrel",6500,"Precision bolt","rifle"],["surgeon","Surgeon Scalpel","Tactical precision",6000,"Precision bolt","rifle"],["mrad","Barrett MRAD","Multi-role sniper",7000,"Precision bolt","rifle"],["gunwerks","Gunwerks ClymR system","Rifle, scope, ballistics",8000,"Precision bolt","rifle"],["axmc","Accuracy International AXMC","Multi-caliber",8000,"Precision bolt","rifle"],["trg","Sako TRG 42",".338 Lapua",4500,"Precision bolt","rifle"],["m82","Barrett M82A1",".50 BMG semi",12000,"Precision bolt","rifle"],["cheytac","CheyTac M200 Intervention",".375 CheyTac",14000,"Precision bolt","rifle"],
+ ["m500","Mossberg 500","12 ga pump",500,"Shotguns","rifle"],["r870","Remington 870","12 ga pump",550,"Shotguns","rifle"],["b1301","Beretta 1301 Tactical","Semi-auto",1500,"Shotguns","rifle"],["sbe3","Benelli Super Black Eagle 3","Waterfowl semi",1900,"Shotguns","rifle"],["m4","Benelli M4","Semi-auto tactical",2200,"Shotguns","rifle"],["citori","Browning Citori","Over-under",2600,"Shotguns","rifle"],["dt11","Beretta DT11","Competition O/U",11000,"Shotguns","rifle"],["perazzi","Perazzi MX2000","Competition O/U",13000,"Shotguns","rifle"],["k80","Krieghoff K-80","Competition O/U",15000,"Shotguns","rifle"],["purdey","Purdey side-by-side","Bespoke, London",150000,"Shotguns","rifle"],["hhroyal","Holland & Holland Royal","Bespoke side-by-side",150000,"Shotguns","rifle"],["boss","Boss & Co over-under","Bespoke, 2-year wait",175000,"Shotguns","rifle"],
+ ["glockcustom","Custom Glock 19","Slide cut, red dot, Cerakote",1500,"Custom & engraved"],["golddeagle","Gold Desert Eagle",".50 AE, titanium gold",3500,"Custom & engraved"],["gold1911","24K gold-plated Colt 1911","Full gold, pearl grips",8000,"Custom & engraved"],["saa","Turnbull engraved Single Action","Case-hardened, scroll engraving",9000,"Custom & engraved"],["m29eng","Engraved S&W Model 29","Gold inlay, presentation case",12000,"Custom & engraved"],["dam1911","Damascus-steel custom 1911","Hand-fit, ivory-style grips",12000,"Custom & engraved"],["pythoneng","Master-engraved Colt Python","Full coverage, ivory-style grips",15000,"Custom & engraved"],["w1886","Engraved Winchester 1886","Gold game scenes",45000,"Custom & engraved","rifle"],["purdeyeng","Purdey over-under, gold inlays","Master engraver, 3 years",250000,"Custom & engraved","rifle"],["diamondgun","Diamond-inlaid presentation rifle","Gold and diamond inlays",500000,"Custom & engraved","rifle"],
+ ["k98","Mauser K98","WWII bolt action",1200,"Collector","rifle"],["garand","M1 Garand","WWII service rifle",1300,"Collector","rifle"],["carbine","M1 Carbine","WWII",1500,"Collector","rifle"],["tommy","Thompson 1927A-1","Semi-auto Tommy gun",1600,"Collector","rifle"],["luger","Luger P08","Classic German pistol",2500,"Collector"],["colt1st","Colt Single Action Army, 1st gen","1800s",15000,"Collector"],["m16","Colt M16A1 (transferable)","Pre-1986 registered",40000,"Collector","rifle"],["m1928","Thompson M1928 (transferable)","Prohibition-era",50000,"Collector","rifle"]
+],
+"Homes": [
+ ["sd-condo","Condo, Downtown San Diego","2 bed, bay view",650000,"San Diego","building"],["sd-3","3-bed house, San Diego","Near the beach",1050000,"San Diego"],["sd-ob","Beach cottage, Ocean Beach","Steps to the sand",1600000,"San Diego"],["sd-encinitas","Surf house, Encinitas","Ocean view",3000000,"San Diego"],["sd-lj","Oceanview home, La Jolla","Cliffside",5500000,"San Diego"],["sd-coronado","Beachfront, Coronado","On Ocean Blvd",12000000,"San Diego"],["sd-rsf","Estate, Rancho Santa Fe","Equestrian, 5 acres",8000000,"San Diego"],
+ ["lb","Studio, Long Beach","Walk to the pier",450000,"California","building"],["ps","Mid-century, Palm Springs","Pool, mountain views",2200000,"California"],["venice","Modern, Venice Beach","Rooftop deck",3500000,"California"],["hh","Modern, Hollywood Hills","Infinity pool, city views",6000000,"California"],["sf","Victorian, Pacific Heights SF","Golden Gate view",9000000,"California"],["nb","Waterfront, Newport Beach","Private dock",12000000,"California"],["napa","Vineyard estate, Napa","40 acres of vines",15000000,"California"],["bh","Mansion, Beverly Hills","8 bed, theater",18000000,"California"],["malibu","Oceanfront estate, Malibu","Private beach",50000000,"California"],["belair","Mega-mansion, Bel Air","105,000 sq ft",140000000,"California"],
+ ["vegas","Studio condo, Las Vegas","Near the Strip",180000,"West & Mountain","building"],["phx","4-bed, Phoenix","With pool",480000,"West & Mountain"],["pdx","Craftsman, Portland","Porch and garden",650000,"West & Mountain"],["den","Townhome, Denver","Mountain views",700000,"West & Mountain"],["summerlin","Golf-course home, Summerlin NV","Las Vegas",900000,"West & Mountain"],["sedona","Red-rock retreat, Sedona","Canyon views",2000000,"West & Mountain"],["scotts","Desert modern, Scottsdale","Glass and steel",3500000,"West & Mountain"],["tahoe","Lake house, Lake Tahoe","Private dock",3500000,"West & Mountain"],["seattle","Lakefront, Lake Washington","Boathouse",6000000,"West & Mountain"],["parkcity","Ski home, Park City UT","Ski-in, ski-out",7000000,"West & Mountain"],["montana","Ranch, Montana","3,000 acres, river",12000000,"West & Mountain"],["aspen","Ski chalet, Aspen","Downtown slopes",15000000,"West & Mountain"],["jh","Ranch, Jackson Hole","Teton views",20000000,"West & Mountain"],
+ ["okc","3-bed ranch, Oklahoma City","1,600 sq ft",250000,"Texas & South"],["hou","3-bed, Houston","Big yard",330000,"Texas & South"],["atx","Modern, Austin","East side",900000,"Texas & South"],["nola","French Quarter townhouse, New Orleans","Courtyard",1200000,"Texas & South"],["obx","Beach house, Outer Banks NC","Oceanfront",1300000,"Texas & South"],["nash","Craftsman, Nashville","East Nashville",700000,"Texas & South"],["kw","Conch house, Key West","Pool",2500000,"Texas & South"],["atl","Estate, Buckhead Atlanta","Gated",3000000,"Texas & South"],["chs","Historic home, Charleston","On the Battery",3500000,"Texas & South"],["dal","Mansion, Highland Park Dallas","Guest house",6000000,"Texas & South"],["mia","Penthouse, Miami Beach","Rooftop pool",9000000,"Texas & South","building"],["pb","Oceanfront estate, Palm Beach","Private beach",45000000,"Texas & South"],["star","Waterfront mansion, Star Island Miami","Yacht dock",60000000,"Texas & South"],
+ ["det","Brick bungalow, Detroit","Fixer-upper",150000,"East & Midwest"],["bk","Brownstone, Brooklyn","4 floors",3200000,"East & Midwest"],["bos","Townhouse, Back Bay Boston","Roof deck",4000000,"East & Midwest"],["chi","Penthouse, Chicago Gold Coast","Lake views",5000000,"East & Midwest","building"],["mv","Shingle house, Martha's Vineyard","Ocean view",5000000,"East & Midwest"],["hamptons","Estate, the Hamptons","Pool, tennis, beach",25000000,"East & Midwest"],["nyc","Penthouse, Billionaires' Row NYC","Central Park views",40000000,"East & Midwest","building"],
+ ["cr","Surf house, Costa Rica","Jungle and waves",900000,"International"],["kyoto","Machiya townhouse, Kyoto","Restored",1000000,"International"],["tulum","Jungle villa, Tulum","Cenote nearby",1500000,"International"],["tokyo","Apartment, Minato Tokyo","2 bed",2000000,"International","building"],["bali","Cliff villa, Bali","Uluwatu",3000000,"International"],["santorini","Cave villa, Santorini","Caldera view",3000000,"International"],["paris","Apartment, Paris 16th","Eiffel view",5000000,"International","building"],["vanc","Waterfront, Vancouver","Mountain views",5000000,"International"],["dubai","Penthouse, Dubai Marina","Full floor",6000000,"International","building"],["cabo","Oceanfront villa, Cabo","Infinity pool",6000000,"International"],["sydney","Harbourfront, Sydney","Opera House view",20000000,"International"],["palm","Villa, Palm Jumeirah Dubai","Private beach",25000000,"International"],["como","Villa, Lake Como","19th-century",25000000,"International"],["london","Townhouse, Mayfair London","7 floors",30000000,"International"],["gstaad","Chalet, Gstaad","Swiss Alps",40000000,"International"],["courch","Chalet, Courchevel","Indoor pool, ski-in",60000000,"International"],["monaco","Penthouse, Monaco","Overlooks the F1 track",70000000,"International","building"],["peak","Mansion, The Peak Hong Kong","Harbour views",100000000,"International"]
+],
+"Aircraft": [
+ ["sr22","Cirrus SR22T","Piston, whole-plane parachute",1000000,"Props & warbirds","plane"],["l39","Aero L-39 Albatros","Ex-military jet trainer",500000,"Props & warbirds","plane"],["p51","P-51 Mustang","WWII fighter, flying",3500000,"Props & warbirds","plane"],["pc12","Pilatus PC-12 NGX","Single turboprop",6000000,"Props & warbirds","plane"],
+ ["visionjet","Cirrus Vision Jet SF50","Single-engine jet",3000000,"Light jets","plane"],["hondajet","HondaJet Elite II","Light jet",7000000,"Light jets","plane"],["phenom","Embraer Phenom 300E","Best-selling light jet",11000000,"Light jets","plane"],["pc24","Pilatus PC-24","Lands on dirt",11000000,"Light jets","plane"],["cj4","Cessna Citation CJ4 Gen2","Light jet",11500000,"Light jets","plane"],
+ ["latitude","Cessna Citation Latitude","Midsize, flat floor",18000000,"Midsize jets","plane"],["praetor","Embraer Praetor 600","Super-midsize",21000000,"Midsize jets","plane"],["g280","Gulfstream G280","Super-midsize",25000000,"Midsize jets","plane"],["ch3500","Bombardier Challenger 3500","Super-midsize",27000000,"Midsize jets","plane"],["longitude","Cessna Citation Longitude","Super-midsize",30000000,"Midsize jets","plane"],["falcon2000","Dassault Falcon 2000LXS","Large cabin",35000000,"Midsize jets","plane"],
+ ["g500","Gulfstream G500","Large cabin",47000000,"Heavy jets","plane"],["g5500","Bombardier Global 5500","Long range",46000000,"Heavy jets","plane"],["f6x","Dassault Falcon 6X","Widest cabin in class",47000000,"Heavy jets","plane"],["g600","Gulfstream G600","Long range",58000000,"Heavy jets","plane"],["f8x","Dassault Falcon 8X","Tri-jet",60000000,"Heavy jets","plane"],["g800","Gulfstream G800","8,000 nm range",72000000,"Heavy jets","plane"],["f10x","Dassault Falcon 10X","Ultra long range",75000000,"Heavy jets","plane"],["g7500","Bombardier Global 7500","Four cabin zones",75000000,"Heavy jets","plane"],["g700","Gulfstream G700","Flagship, 5 living areas",78000000,"Heavy jets","plane"],["g8000","Bombardier Global 8000","Fastest business jet",78000000,"Heavy jets","plane"],
+ ["bbjmax","Boeing BBJ 737 MAX","Flying penthouse",100000000,"Airliners","plane"],["acj320","Airbus ACJ320neo","Corporate airliner",110000000,"Airliners","plane"],["bbj787","Boeing BBJ 787","Widebody private",250000000,"Airliners","plane"],["acj350","Airbus ACJ350","Widebody, 25 guests",300000000,"Airliners","plane"],
+ ["r44","Robinson R44 Raven II","4-seat piston",500000,"Helicopters","heli"],["bell505","Bell 505","Light turbine",1500000,"Helicopters","heli"],["h130","Airbus H130","Panoramic cabin",3500000,"Helicopters","heli"],["aw109","Leonardo AW109 Trekker","Twin-engine",7000000,"Helicopters","heli"],["s76","Sikorsky S-76D","Executive twin",15000000,"Helicopters","heli"],["ach160","Airbus ACH160","VIP flagship",20000000,"Helicopters","heli"]
+],
+"Yachts & Islands": [
+ ["seadoo","Sea-Doo RXP-X 325","Jet ski",20000,"Boats"],["wake","Malibu Wakesetter 25 LSV","Wake boat",250000,"Boats"],["sundancer","Sea Ray Sundancer 350","Cruiser",450000,"Boats"],["whaler","Boston Whaler 380 Outrage","Center console",600000,"Boats"],["riva","Riva Aquariva","Mahogany runabout",900000,"Boats"],["freeman","Freeman 47","Quad-outboard center console",1500000,"Boats"],["triton","Triton personal submarine","3-person, 1,000 m",3500000,"Boats"],
+ ["sunseeker","Sunseeker 76 Yacht","Flybridge",5000000,"Yachts"],["azimut","Azimut Grande 30m","Tri-deck",15000000,"Yachts"],["perini","Perini Navi 56m sailing yacht","Sailing superyacht",40000000,"Yachts"],["benetti","Benetti Oasis 40m","Beach-club deck",30000000,"Yachts"],
+ ["feadship","Feadship 60m","Custom Dutch build",120000000,"Superyachts"],["luerssen","Lürssen 90m","Helipad, cinema",250000000,"Superyachts"],["explorer","Explorer yacht, 80m","Helipad, submarine, ice class",300000000,"Superyachts"],["giga","Gigayacht, 140m","Largest class afloat",600000000,"Superyachts"],
+ ["belize","Private caye, Belize","Beachfront, 5 acres",2000000,"Private islands","island"],["fiji","Private island, Fiji","Reef and lagoon",10000000,"Private islands","island"],["exumas","Private island, Exumas","Bahamas, turquoise water",15000000,"Private islands","island"],["greek","Private island, Greece","Ionian Sea, villa",30000000,"Private islands","island"],["bvi","Private island, British Virgin Islands","Resort and staff",60000000,"Private islands","island"],["bahamas","Private island, Bahamas","Airstrip and marina",75000000,"Private islands","island"],["maldives","Private island resort, Maldives","Overwater villas",100000000,"Private islands","island"]
+],
+"Lifestyle": [
+ ["cc","Country club membership","Golf, pool, dining",100000,"Memberships","card"],["skiclub","Private ski club membership","Mountain club",400000,"Memberships","card"],["jetcard","Private jet card, 25 hours","Fly on any jet",250000,"Memberships","plane"],["share","Fractional jet share (1/16)","Guaranteed availability",1000000,"Memberships","plane"],["golf","Elite private golf club initiation","Invitation-only course",1000000,"Memberships","trophy"],["suite","NFL stadium suite lease","Season of home games",500000,"Memberships","card"],
+ ["horse10","Thoroughbred syndicate share, 10%","Race-ready colt",100000,"Hobbies & racing","horse"],["yearling","Kentucky Derby-prospect yearling","Top bloodline",1500000,"Hobbies & racing","horse"],["polo","Polo team, full season","Ponies, grooms, travel",2000000,"Hobbies & racing","horse"],["gt3season","GT3 race season, pro co-driver","Car, crew, entries",1500000,"Hobbies & racing","trophy"],["paddock","F1 Paddock Club, full season","Every race",500000,"Hobbies & racing","trophy"],["safari","Private-reserve safari","Two weeks, Africa",100000,"Hobbies & racing","star"],["heliski","Private heli-skiing week","Alaska",150000,"Hobbies & racing","heli"],
+ ["winetasting","Private vintage wine tasting","Sommelier-led, 1940s vintages",150000,"Wine & dining","wine"],["drc","1945 Romanée-Conti, one bottle","Record-setting Burgundy",558000,"Wine & dining","wine"],["cellar","Starter fine-wine cellar","500 bottles",250000,"Wine & dining","wine"],["chefsdinner","Michelin-chef private dinner","At your house, 20 guests",75000,"Wine & dining","chef"],
+ ["subflight","Suborbital spaceflight seat","See the curve of Earth",450000,"Experiences","rocket"],["orbit","Orbital spaceflight seat","Days in orbit",55000000,"Experiences","rocket"],["titanicdive","Deep-ocean submersible dive","To a famous wreck",250000,"Experiences","yacht"],["concert","Private concert by a headliner","Your backyard",2000000,"Experiences","star"]
+],
+"Staff": [
+ ["butler","Butler / estate manager","1-year contract",150000,"Household","user"],["housekeeping","Housekeeping team (3)","1-year contract",180000,"Household","user"],["houseteam","Full household team","House manager + 4 staff, 1 year",400000,"Household","user"],["grounds","Groundskeepers","1-year contract",150000,"Household","user"],["assistant","Personal assistant","1-year contract",100000,"Household","user"],["trainer","Full-time personal trainer","1-year contract",120000,"Household","user"],["stylist","Personal stylist","1-year contract",100000,"Household","user"],
+ ["chef","Private chef","1-year contract",120000,"Culinary","chef"],["chefteam","Culinary team (chef + 2)","1-year contract",300000,"Culinary","chef"],["somm","Private sommelier","1-year contract",120000,"Culinary","wine"],
+ ["chauffeur","Chauffeur","1-year contract",90000,"Security & travel","car"],["mechanic","Dedicated car mechanic","1-year contract",110000,"Security & travel","wrench"],["pilots","Jet crew (2 pilots + attendant)","1-year contract",450000,"Security & travel","plane"],["ep","Executive protection team, 24/7","1-year contract",750000,"Security & travel","shield"],["yachtcrew","Superyacht crew","1-year contract",2000000,"Security & travel","yacht"],
+ ["cpa","Private CPA","1-year retainer",60000,"Advisors","user"],["wealth","Wealth advisor","1-year retainer",250000,"Advisors","user"],["family","Family office team","CIO, lawyers, accountants, 1 year",1000000,"Advisors","user"]
+],
+"Novelty": [
+ ["grill","Custom diamond grill","VVS stones",50000,"Jewelry & watches","gem"],["cuban","Platinum diamond Cuban link","Iced out",250000,"Jewelry & watches","gem"],["rm","Richard Mille RM 56-02","Sapphire case",2200000,"Jewelry & watches","gem"],["bluediamond","Blue diamond ring","5 carats",10000000,"Jewelry & watches","gem"],["pink","Pink diamond, 10 carats","Fancy vivid",20000000,"Jewelry & watches","gem"],["grandmaster","Patek Philippe Grandmaster Chime","Unique, auction record",31000000,"Jewelry & watches","gem"],
+ ["pinball","Custom pinball machine","Themed after your life",30000,"Bespoke objects","star"],["jetsuit","Jet suit","Fly with 5 engines",440000,"Bespoke objects","rocket"],["goldbike","Gold-plated custom motorcycle","One-off build",400000,"Bespoke objects","gem"],["chess","Gold and diamond chess set","Hand-carved",600000,"Bespoke objects","gem"],["lure","Diamond and gold fishing lure","Hundreds of diamonds",1000000,"Bespoke objects","fish"],["lure2","Supreme diamond fishing lure","18K gold, 4,000+ diamonds",4000000,"Bespoke objects","fish"],["statue","Life-size gold statue of yourself","Sculpted in bronze, gold-leafed",1500000,"Bespoke objects","star"],["egg","Jeweled egg commission","Master jeweler, 2 years",2000000,"Bespoke objects","gem"],["toilet","Solid 18K gold toilet","Fully working",6000000,"Bespoke objects","gem"],
+ ["apple1","Apple-1 computer","Working, 1976",900000,"Collectibles","star"],["jordan","Game-worn 1998 Finals sneakers","Signed",2200000,"Collectibles","star"],["meteor","Martian meteorite","Largest piece known",5300000,"Collectibles","rocket"],["mantle","1952 Topps Mickey Mantle","Mint condition",12600000,"Collectibles","star"],["ruth","Babe Ruth 'called shot' jersey","1932 World Series",24000000,"Collectibles","star"],["trex","T. rex skeleton","Museum-grade",31800000,"Collectibles","star"],["steg","Stegosaurus skeleton","Nearly complete",44600000,"Collectibles","star"],
+ ["superman","Superman cape (screen-worn, 1978)","From the original film",190000,"Movie & TV props","film"],["wilson","'Wilson' volleyball from Cast Away","Screen-used",308000,"Movie & TV props","film"],["lightsaber","Luke Skywalker lightsaber prop","Screen-used, Star Wars",450000,"Movie & TV props","film"],["hoverboard","Marty McFly hoverboard","Screen-used, Back to the Future II",500000,"Movie & TV props","film"],["fedora","Indiana Jones fedora","Screen-worn, Temple of Doom",630000,"Movie & TV props","film"],["door","Titanic floating door panel","Screen-used",718750,"Movie & TV props","film"],["vader","Darth Vader helmet","Screen-used, Empire Strikes Back",1100000,"Movie & TV props","film"],["r2","R2-D2 (screen-used)","Assembled from original parts",2760000,"Movie & TV props","film"],["mmdress","Marilyn Monroe subway dress","The Seven Year Itch",4600000,"Movie & TV props","film"],["slippers","Ruby slippers","The Wizard of Oz, screen-worn",32500000,"Movie & TV props","film"],
+ ["anicel","Hand-painted 1980s anime production cel","Original, with background",15000,"Anime & games","brush"],["akiracel","Akira production cel","1988, Kaneda's bike scene",30000,"Anime & games","brush"],["animestatue","Life-size custom anime statue","Commissioned, fiberglass",250000,"Anime & games","figure"],["nesprototype","Nintendo PlayStation prototype","The console that never launched",360000,"Anime & games","game"],["charizard","1st Edition Shadowless Charizard, PSA 10","Base Set, 1999",420000,"Anime & games","game"],["zelda","Sealed The Legend of Zelda (NES)","Graded 9.0 A",870000,"Anime & games","game"],["sm64","Sealed Super Mario 64, graded 9.8","Record-setting copy",1560000,"Anime & games","game"],["smb","Sealed Super Mario Bros. (NES)","Graded 9.8 A++",2000000,"Anime & games","game"],["onering","The One Ring MTG card, serialized 1/1","Magic: The Gathering",2000000,"Anime & games","game"],["bls","Tournament Black Luster Soldier","Yu-Gi-Oh!, one of one",2000000,"Anime & games","game"],["dbart","Dragon Ball original cover art","Hand-drawn by Akira Toriyama",3000000,"Anime & games","brush"],["pikachu","Pikachu Illustrator card, PSA 10","Rarest Pokémon card",5300000,"Anime & games","game"],
+ ["tec27","Detective Comics #27","Batman's first appearance",1740000,"Art & comics","brush"],["af15","Amazing Fantasy #15, CGC 9.6","Spider-Man's first appearance",3600000,"Art & comics","brush"],["secretwars","Original Spider-Man comic page","1984, black suit debut",3400000,"Art & comics","brush"],["tintin","Tintin original cover artwork","By Hergé",3400000,"Art & comics","brush"],["frazetta","Frank Frazetta original painting","Fantasy art, Egyptian Queen",5400000,"Art & comics","brush"],["action1","Action Comics #1, CGC 8.5","Superman's first appearance",6000000,"Art & comics","brush"],["haring","Keith Haring painting","1980s street-pop canvas",6000000,"Art & comics","brush"],["kawsalbum","KAWS 'The KAWS Album'","Cartoon parody painting",14700000,"Art & comics","brush"],["banksy","Banksy 'Love Is in the Bin'","The shredded painting",25400000,"Art & comics","brush"],["nara","Yoshitomo Nara 'Knife Behind Back'","Anime-style painting",25000000,"Art & comics","brush"],["lichtenstein","Roy Lichtenstein 'Nurse'","Comic-style pop art",95400000,"Art & comics","brush"],["basquiat","Jean-Michel Basquiat 'Untitled' (1982)","Skull painting",110500000,"Art & comics","brush"],["marilyn","Andy Warhol 'Shot Sage Blue Marilyn'","Priciest 20th-century artwork",195000000,"Art & comics","brush"],
+ ["butcher","Beatles 'Butcher' cover, sealed","Yesterday and Today, 1966",125000,"Music","music"],["sgtpepper","Signed Sgt. Pepper's LP","All four Beatles",290000,"Music","music"],["elvis","Elvis Presley's first record","1953 acetate, My Happiness",300000,"Music","music"],["biggie","The Notorious B.I.G. crown","From the 'King of New York' shoot",595000,"Music","music"],["whitealbum","Beatles White Album No. 0000001","Ringo's own copy",790000,"Music","music"],["blackie","Eric Clapton's 'Blackie' Strat","His main guitar for 15 years",959500,"Music","music"],["tupac","Tupac's crown ring","Gold, rubies, diamonds",1000000,"Music","music"],["thriller","Michael Jackson's Thriller jacket","Worn in the video",1800000,"Music","music"],["hendrix","Jimi Hendrix's Woodstock Strat","Played the anthem on it",2000000,"Music","music"],["blackstrat","David Gilmour's Black Strat","Pink Floyd",3975000,"Music","music"],["shaolin","Wu-Tang 'Once Upon a Time in Shaolin'","The only copy that exists",4000000,"Music","music"],["cobain","Kurt Cobain's Unplugged guitar","Martin D-18E",6000000,"Music","music"],
+ ["hottoys","Hot Toys 1/6 scale figure","Movie-accurate collectible",300,"Statues & figures","figure"],["prime1","Prime 1 Studio museum statue","Half-scale, limited run",2000,"Statues & figures","figure"],["bearbrick","Be@rbrick 1000%","Limited art collab",5000,"Statues & figures","figure"],["lifesize","Life-size Darth Vader statue","Licensed, 6'6\"",10000,"Statues & figures","figure"],["gijoe","G.I. Joe original hand-built prototype","1963",200000,"Statues & figures","figure"],["bobafett","Rocket-firing Boba Fett prototype","Kenner, never released",236000,"Statues & figures","figure"],["kawscomp","KAWS large Companion bronze","Monumental sculpture",1000000,"Statues & figures","figure"],["cowboy","Takashi Murakami 'My Lonesome Cowboy'","Anime-style sculpture",15200000,"Statues & figures","figure"],["balloondog","Jeff Koons 'Balloon Dog (Orange)'","Mirror-polished steel",58400000,"Statues & figures","figure"],["rabbit","Jeff Koons 'Rabbit'","Record for a living artist",91100000,"Statues & figures","figure"],
+ ["moon10g","Lunar meteorite fragment, 10 g","A real piece of the Moon",10000,"Space & moon","moon"],["moon1kg","Lunar meteorite, 1 kg","Fist-sized piece of the Moon",1000000,"Space & moon","moon"],["luna16","Luna-16 Soviet moon soil","Brought back by robot, 1970",855000,"Space & moon","moon"],["apollobag","Apollo 11 lunar sample bag","With Moon dust from 1969",1800000,"Space & moon","moon"],
+ ["lambotractor","Lamborghini tractor, gold trim","Farm in style",500000,"Wild","truck"],["tank","Decommissioned battle tank","Demilitarized, drives",400000,"Wild","truck"],["bunker","Underground luxury bunker","Pool, cinema, 2 years of food",3000000,"Wild","shield"],["volcano","Dormant volcano, with land","Your own crater",8000000,"Wild","island"],["castle","Scottish castle","Highlands, 200 acres",12000000,"Wild","building"]
+]
+};
+const MARKET = [
+ // [id, title, price, miles, place, seller, note, kind]
+ ["mk-civic03","2003 Honda Civic EX",3200,"212k mi","Chula Vista","Marco R.","Runs great, small dent on rear bumper. Cold AC.","car"],
+ ["mk-rx8","2005 Mazda RX-8",1500,"118k mi","El Cajon","Tyler B.","Engine knocks. As-is. Bring a trailer.","car"],
+ ["mk-crownvic","2008 Ford Crown Vic Police Interceptor",3500,"161k mi","Santee","Dave H.","Ex-cop car. Spotlight still works.","car"],
+ ["mk-ls400","1996 Lexus LS400",3000,"280k mi","Escondido","Linda K.","Will outlive us all. Garage kept.","car"],
+ ["mk-mini","2012 Mini Cooper S",2800,"134k mi","Oceanside","Jess M.","Might need timing chain. Fun car.","car"],
+ ["mk-330i","2001 BMW 330i",3800,"190k mi","Clairemont","Kevin T.","Manual. New cooling system.","car"],
+ ["mk-g35","2004 Infiniti G35 Coupe",3900,"175k mi","National City","Andre P.","Needs clutch. Otherwise clean.","car"],
+ ["mk-c10","1972 Chevy C10",4000,"Unknown","Lakeside","Ray G.","Project truck. Bill of sale only.","truck"],
+ ["mk-miata","1995 Mazda Miata",4200,"156k mi","Pacific Beach","Sam W.","Clean title. Soft top has a rip.","car"],
+ ["mk-corolla","2006 Toyota Corolla",4500,"188k mi","Spring Valley","Maria L.","Grandma's car. Oil changed on time.","car"],
+ ["mk-ek","1997 Honda Civic Hatch (EK)",5000,"201k mi","Mira Mesa","Jay N.","Mostly stock. No mods, I promise.","car"],
+ ["mk-xj","1999 Jeep Cherokee XJ",5500,"214k mi","Ramona","Cody F.","3\" lift on 31s. Leaks oil like it should.","truck"],
+ ["mk-s13","1990 Nissan 240SX Hatch",6000,"Unknown","Imperial Beach","Danny V.","Drift missile. KA swap, welded diff.","car"],
+ ["mk-wrxwagon","2004 Subaru WRX Wagon",6200,"167k mi","Poway","Erin C.","Head gaskets done. Turbo whistles.","car"],
+ ["mk-is300","2001 Lexus IS300 5-speed",6500,"198k mi","Kearny Mesa","Hiro T.","2JZ-GE, manual. Rare.","car"],
+ ["mk-accord","2010 Honda Accord",6800,"150k mi","La Mesa","Paul S.","Daily driver. Nothing wrong with it.","car"],
+ ["mk-mr2","1985 Toyota MR2",7000,"142k mi","Encinitas","Greg A.","Mid-engine. Pop-up lights work.","car"],
+ ["mk-silverado","2007 Chevy Silverado 1500",7500,"210k mi","Alpine","Bill O.","Work truck. Tow hitch.","truck"],
+ ["mk-tacoma98","1998 Toyota Tacoma",7800,"260k mi","Fallbrook","Luis M.","Rust-free California truck.","truck"],
+ ["mk-350z","2003 Nissan 350Z",7900,"160k mi","Carlsbad","Nate D.","6-speed. Aftermarket exhaust. Loud.","car"],
+ ["mk-ranger","2008 Ford Ranger 4x4",8500,"175k mi","Valley Center","Rick J.","Good tires. Ready for the dirt.","truck"],
+ ["mk-4r","2000 Toyota 4Runner SR5",8900,"240k mi","Jamul","Steve R.","Timing belt done. 4x4 works.","truck"],
+ ["mk-22re","1987 Toyota Pickup 22RE 4x4",9500,"230k mi","Julian","Hank W.","Solid axle. Will never die.","truck"],
+ ["mk-g8","2009 Pontiac G8 GT",11000,"128k mi","Rancho Bernardo","Chris E.","6.0 V8. Aussie muscle sedan.","car"],
+ ["mk-fd","1993 Mazda RX-7 FD",14000,"Unknown","Point Loma","Ken Y.","Rotary needs rebuild. Body is clean.","car"],
+ ["mk-crf","2006 Honda CRF250R",2500,"N/A","Lakeside","Ty B.","Dirt bike. Starts on 2nd kick.","truck"]
+];
+const MODS = {
+ car:{label:"Performance", items:[["intake","Cold air intake",400,10],["catback","Cat-back exhaust",1500,10],["tiexh","Custom titanium exhaust",6000,20],["headers","Long-tube headers",2000,25],["tune","ECU tune",1200,40],["ic","Upgraded intercooler",1500,15],["e85","E85 flex-fuel kit",1800,60],["meth","Methanol injection",1500,50],["nos","Nitrous kit, 100 shot",1200,100],["sc","Supercharger kit",9000,180],["whipple","Whipple supercharger",15000,300],["turbo","Big single turbo kit",12000,250],["twin","Twin-turbo kit",25000,450],["forged","Forged internals",12000,0],["trans","Built transmission",8000,0],["ls","LS3 engine swap",15000,150],["2jz","2JZ engine swap",25000,200],["coil","Coilovers",2500,0],["air","Air suspension",5000,0],["bbk","Big brake kit",5000,0],["wheels","Forged wheels",6000,0],["wide","Widebody kit",15000,0],["carbon","Full carbon aero",20000,0],["seats","Racing seats",4000,0],["cage","Roll cage",6000,0],["ppf","Paint protection film",7000,0],["wrap","Custom wrap",4000,0],["candy","Custom candy paint",20000,0],["star","Starlight headliner",3000,0]]},
+ offroad:{label:"Off-road", items:[["lift","3–6\" lift kit",5000,0],["lt","Long-travel suspension",25000,0],["bypass","Bypass shocks",9000,0],["37s","37\" tires on beadlocks",6000,0],["40s","40\" tires",8000,0],["lockers","Front and rear lockers",3000,0],["winch","Winch and steel bumper",4000,0],["lights","LED light bars",2500,0],["snorkel","Snorkel",800,0],["rtt","Rooftop tent",4000,0],["portals","Portal axles",30000,0]]},
+ gun:{label:"Upgrades", items:[["light","Weapon light",300,0],["trigger","Trigger job",400,0],["cera","Custom Cerakote",400,0],["rdo","Red dot optic",600,0],["case","Custom hard case",800,0],["supp","Suppressor",1200,0],["grips","Custom ivory-style grips",1500,0],["lpvo","LPVO scope",2500,0],["chassis","Carbon chassis",2500,0],["gold","Gold plating",2500,0],["nf","Long-range scope",3500,0],["engrave","Hand engraving",6000,0],["inlay","Gold-inlay engraving",15000,0],["dgrips","Diamond-inlaid grips",50000,0]]},
+ home:{label:"Installations", items:[["wall","Indoor climbing wall",120000,0],["arcade","Gaming room and arcade",150000,0],["slide","Waterslide into the pool",200000,0],["pool","Infinity pool",250000,0],["smart","Smart home and security",250000,0],["theater","Home theater",300000,0],["roof","Rooftop garden",300000,0],["spa","Spa: sauna, cold plunge, cryo",400000,0],["lift","Car elevator, +2 spaces",400000,0],["panic","Panic room",500000,0],["cellar","Wine cellar",500000,0],["studio","Recording studio",600000,0],["bowl","Bowling alley",750000,0],["obs","Observatory dome",800000,0],["court","Indoor basketball court",1000000,0],["helipad","Helipad",1000000,0],["range","Indoor shooting range",1500000,0],["ice","Ice rink",1500000,0],["dock","Private dock and boathouse",2000000,0],["club","Private nightclub",2000000,0],["atmo","Sea-level atmospheric simulation chamber",2500000,0],["garage","Underground garage, +20 spaces",3000000,0],["aqua","Sunken indoor-outdoor scuba lagoon",8000000,0],["garage4","Larger garage, +4 spaces",250000,0],["resortpool","Bigger resort-style pool",600000,0],["party","Party room",400000,0],["ballroom","Grand ballroom",2500000,0],["guest","Guest house",1200000,0],["tennis","Tennis court",150000,0],["gym","Home gym",200000,0],["library","Two-story library",300000,0],["kitchen","Chef's kitchen",350000,0],["koi","Koi pond",80000,0],["outdoorbar","Outdoor kitchen and bar",150000,0],["firepit","Fire-pit lounge",60000,0],["treehouse","Luxury treehouse",90000,0],["zen","Zen garden",120000,0],["master","Master suite expansion",900000,0],["trophy","Trophy room, +10 display spots",500000,0],["vault","Gun vault and armory, +15 display spots",350000,0],["gallery","Art gallery wing, +20 display spots",2000000,0],["museum","Car museum showroom, +15 spaces",5000000,0]]},
+ air:{label:"Upgrades", items:[["wifi","Satellite Wi-Fi",500000,0],["paint","Custom livery",400000,0],["interior","Bespoke VIP interior",5000000,0],["suite","Master suite with shower",8000000,0]]},
+ sea:{label:"Upgrades", items:[["toys","Water toys package",250000,0],["tender","Custom tender boat",1500000,0],["sub","Onboard submarine",3500000,0],["helideck","Helideck",5000000,0]]}
+};
+
+// build catalog
+const CATALOG = [];
+for (const [dept, rows] of Object.entries(RAW)) for (const r of rows) CATALOG.push({id:r[0], name:r[1], desc:r[2], price:r[3], sub:r[4], icon:r[5] || DEPT[dept].i, dept});
+for (const c of CATALOG) if (c.id === "meteor") c.sub = "Space & moon";
+const TO_LUX = new Set(["ghost","cullinan","spectre","phantom","bentayga","contgt","brabus","rrsv","boattail"]);
+for (const c of CATALOG) if (TO_LUX.has(c.id)) c.sub = "Luxury";
+for (const m of MARKET) CATALOG.push({id:m[0], name:m[1], price:m[2], miles:m[3], place:m[4], seller:m[5], desc:m[6], icon:m[7], dept:"Marketplace", sub:""});
+const BYID = Object.fromEntries(CATALOG.map(c => [c.id, c]));
+const MODBY = {}; for (const [g, o] of Object.entries(MODS)) for (const m of o.items) MODBY[g + ":" + m[0]] = {g, id:m[0], name:m[1], price:m[2], hp:m[3]};
+const tier = p => p >= 2000000 ? ["legend","Legendary"] : p >= 250000 ? ["epic","Epic"] : p >= 40000 ? ["rare","Rare"] : null;
+
+
+// ======================= VEHICLE SPECS
+const TRANS = {"3MT":"3-Speed Manual","4MT":"4-Speed Manual","5MT":"5-Speed Manual","6MT":"6-Speed Manual","7MT":"7-Speed Manual","3AT":"3-Speed Automatic","4AT":"4-Speed Automatic","5AT":"5-Speed Automatic","6AT":"6-Speed Automatic","7AT":"7-Speed Automatic","8AT":"8-Speed Automatic","9AT":"9-Speed Automatic","10AT":"10-Speed Automatic","6DCT":"6-Speed Dual-Clutch","7DCT":"7-Speed Dual-Clutch","8DCT":"8-Speed Dual-Clutch","9DCT":"9-Speed Dual-Clutch","7AMT":"7-Speed Automated Manual","4SEQ":"4-Speed Sequential","5SEQ":"5-Speed Sequential","6SEQ":"6-Speed Sequential","7SEQ":"7-Speed Sequential","9MC":"9-Speed Multi-Clutch","1EV":"Single-Speed Direct Drive","2EV":"2-Speed Automatic","DD":"Koenigsegg Direct Drive","CVT":"CVT"};
+const DRIVE = {RWD:"Rear-Wheel Drive",FWD:"Front-Wheel Drive",AWD:"All-Wheel Drive","4WD":"Four-Wheel Drive",CHAIN:"Chain Drive"};
+const SPECS_RAW = `
+civicsi|Honda|Civic|2027|Si|Sedan|1.5L turbo I4|200|6MT|FWD
+miata|Mazda|MX-5 Miata RF|2027|Grand Touring|Convertible|2.0L I4|181|6MT|RWD
+gr86|Toyota|GR86|2027|Premium|Coupe|2.4L flat-4|228|6MT|RWD
+brz|Subaru|BRZ|2027|tS|Coupe|2.4L flat-4|228|6MT|RWD
+wrx|Subaru|WRX|2027|Premium|Sedan|2.4L turbo flat-4|271|6MT|AWD
+grcor|Toyota|GR Corolla|2027|Premium|Hatchback|1.6L turbo I3|300|6MT|AWD
+nz|Nissan|Z|2027|Performance|Coupe|3.0L twin-turbo V6|400|6MT|RWD
+ctr|Honda|Civic Type R|2027|Base|Hatchback|2.0L turbo I4|315|6MT|FWD
+integras|Acura|Integra|2027|Type S|Hatchback|2.0L turbo I4|320|6MT|FWD
+supra|Toyota|GR Supra|2026|3.0 Premium|Coupe|3.0L turbo I6|382|6MT|RWD
+znismo|Nissan|Z|2027|Nismo|Coupe|3.0L twin-turbo V6|420|9AT|RWD
+rcf|Lexus|RC F|2025|Final Edition|Coupe|5.0L V8|472|8AT|RWD
+lc500|Lexus|LC 500|2027|Base|Coupe|5.0L V8|471|10AT|RWD
+gtr|Nissan|GT-R|2024|Nismo|Coupe|3.8L twin-turbo V6|600|6DCT|AWD
+lfa|Lexus|LFA|2012|Base|Coupe|4.8L V10|553|6SEQ|RWD
+s13|Nissan|240SX|1992|SE|Hatchback|2.4L I4 (KA24DE)|155|5MT|RWD
+fc|Mazda|RX-7|1989|Turbo II|Coupe|1.3L turbo rotary|200|5MT|RWD
+3000gt|Mitsubishi|3000GT|1996|VR-4|Coupe|3.0L twin-turbo V6|320|6MT|AWD
+jzx100|Toyota|Chaser|1998|Tourer V|Sedan|2.5L turbo I6 (1JZ-GTE)|280|5MT|RWD
+ae86|Toyota|Sprinter Trueno|1986|GT-Apex|Hatchback|1.6L I4 (4A-GE)|128|5MT|RWD
+s15|Nissan|Silvia|2000|Spec-R|Coupe|2.0L turbo I4 (SR20DET)|247|6MT|RWD
+r32|Nissan|Skyline GT-R|1993|R32|Coupe|2.6L twin-turbo I6 (RB26DETT)|276|5MT|AWD
+evo9|Mitsubishi|Lancer Evolution|2006|IX MR|Sedan|2.0L turbo I4 (4G63)|286|6MT|AWD
+dc2|Acura|Integra|1998|Type R|Coupe|1.8L I4 (B18C5)|195|5MT|FWD
+fd|Mazda|RX-7|1993|R1|Coupe|1.3L twin-turbo rotary|255|5MT|RWD
+r33|Nissan|Skyline GT-R|1997|R33 V-Spec|Coupe|2.6L twin-turbo I6 (RB26DETT)|276|5MT|AWD
+s2kcr|Honda|S2000|2009|CR|Convertible|2.2L I4 (F22C1)|237|6MT|RWD
+nsx1|Honda|NSX|1991|NA1|Coupe|3.0L V6 (C30A)|270|5MT|RWD
+mk4|Toyota|Supra|1997|Turbo|Coupe|3.0L twin-turbo I6 (2JZ-GTE)|320|6MT|RWD
+nsxs|Acura|NSX|2022|Type S|Coupe|3.5L twin-turbo V6 hybrid|600|9DCT|AWD
+r34|Nissan|Skyline GT-R|1999|V-Spec|Coupe|2.6L twin-turbo I6 (RB26DETT)|276|6MT|AWD
+22b|Subaru|Impreza|1998|22B STi|Coupe|2.2L turbo flat-4|276|5MT|AWD
+mustang|Ford|Mustang|2027|EcoBoost Premium|Coupe|2.3L turbo I4|315|10AT|RWD
+mgt|Ford|Mustang|2027|GT|Coupe|5.0L V8 (Coyote)|480|6MT|RWD
+camss|Chevrolet|Camaro|2024|2SS|Coupe|6.2L V8 (LT1)|455|6MT|RWD
+daytona|Dodge|Charger Daytona|2027|Scat Pack|Coupe|Dual-motor electric|670|1EV|AWD
+dh|Ford|Mustang|2027|Dark Horse|Coupe|5.0L V8 (Coyote)|500|6MT|RWD
+stingray|Chevrolet|Corvette|2027|Stingray 2LT|Coupe|6.2L V8 (LT2)|495|8DCT|RWD
+zl1|Chevrolet|Camaro|2024|ZL1|Coupe|6.2L supercharged V8 (LT4)|650|6MT|RWD
+gt500|Ford|Shelby GT500|2022|Carbon Fiber Track|Coupe|5.2L supercharged V8|760|7DCT|RWD
+redeye|Dodge|Challenger|2023|SRT Hellcat Redeye|Coupe|6.2L supercharged V8|797|8AT|RWD
+plaid|Tesla|Model S|2027|Plaid|Sedan|Tri-motor electric|1020|1EV|AWD
+blackwing|Cadillac|CT5-V|2027|Blackwing|Sedan|6.2L supercharged V8|668|6MT|RWD
+hummer|GMC|Hummer EV SUV|2027|3X|SUV|Tri-motor electric|830|1EV|AWD
+cyber|Tesla|Cybertruck|2027|Cyberbeast|Pickup|Tri-motor electric|845|1EV|AWD
+eray|Chevrolet|Corvette|2027|E-Ray 3LZ|Coupe|6.2L V8 hybrid|655|8DCT|AWD
+z06|Chevrolet|Corvette|2027|Z06 3LZ|Coupe|5.5L flat-plane V8 (LT6)|670|8DCT|RWD
+escv|Cadillac|Escalade-V|2027|Base|SUV|6.2L supercharged V8|682|10AT|AWD
+zr1|Chevrolet|Corvette|2027|ZR1|Coupe|5.5L twin-turbo V8 (LT7)|1064|8DCT|RWD
+viper|Dodge|Viper|2017|ACR|Coupe|8.4L V10|645|6MT|RWD
+fordgt|Ford|GT|2020|Carbon Series|Coupe|3.5L twin-turbo V6|660|7DCT|RWD
+gti|Volkswagen|Golf GTI|2027|SE|Hatchback|2.0L turbo I4|241|7DCT|FWD
+golfr|Volkswagen|Golf R|2027|Base|Hatchback|2.0L turbo I4|315|7DCT|AWD
+rs3|Audi|RS 3|2027|Base|Sedan|2.5L turbo I5|401|7DCT|AWD
+macan|Porsche|Macan|2027|Turbo Electric|SUV|Dual-motor electric|630|1EV|AWD
+m2|BMW|M2|2027|RWD|Coupe|3.0L twin-turbo I6|473|6MT|RWD
+m3|BMW|M3|2027|Competition|Sedan|3.0L twin-turbo I6|503|8AT|RWD
+c63|Mercedes-AMG|C 63 S E Performance|2027|Base|Sedan|2.0L turbo I4 plug-in hybrid|671|9AT|AWD
+giulia|Alfa Romeo|Giulia|2025|Quadrifoglio|Sedan|2.9L twin-turbo V6|505|8AT|RWD
+m5|BMW|M5|2027|Base|Sedan|4.4L twin-turbo V8 hybrid|717|8AT|AWD
+rs6|Audi|RS 6 Avant|2027|Performance|Wagon|4.0L twin-turbo V8|621|8AT|AWD
+carrera|Porsche|911|2027|Carrera|Coupe|3.0L twin-turbo flat-6|388|8DCT|RWD
+m4csl|BMW|M4|2023|CSL|Coupe|3.0L twin-turbo I6|543|8AT|RWD
+rsgt|Audi|RS e-tron GT|2027|Performance|Sedan|Dual-motor electric|912|2EV|AWD
+g63|Mercedes-AMG|G 63|2027|Base|SUV|4.0L twin-turbo V8|577|9AT|4WD
+vantage|Aston Martin|Vantage|2027|Coupe|Coupe|4.0L twin-turbo V8|656|8AT|RWD
+cayturbo|Porsche|Cayenne|2026|Turbo GT|SUV|4.0L twin-turbo V8|650|8AT|AWD
+taycan|Porsche|Taycan|2027|Turbo S|Sedan|Dual-motor electric|938|2EV|AWD
+bentayga|Bentley|Bentayga|2027|Speed|SUV|4.0L twin-turbo V8|641|8AT|AWD
+rrsv|Land Rover|Range Rover|2027|SV|SUV|4.4L twin-turbo V8|606|8AT|4WD
+turbos|Porsche|911|2027|Turbo S|Coupe|3.6L twin-turbo flat-6 hybrid|701|8DCT|AWD
+gt3rs|Porsche|911|2026|GT3 RS|Coupe|4.0L flat-6|518|7DCT|RWD
+db12|Aston Martin|DB12|2027|Coupe|Coupe|4.0L twin-turbo V8|671|8AT|RWD
+contgt|Bentley|Continental GT|2027|Speed|Coupe|4.0L twin-turbo V8 hybrid|771|8DCT|AWD
+brabus|Brabus|800 (G 63)|2027|Widestar|SUV|4.0L twin-turbo V8|789|9AT|4WD
+ghost|Rolls-Royce|Ghost|2027|Series II|Sedan|6.75L twin-turbo V12|563|8AT|AWD
+cullinan|Rolls-Royce|Cullinan|2027|Series II|SUV|6.75L twin-turbo V12|563|8AT|AWD
+spectre|Rolls-Royce|Spectre|2027|Base|Coupe|Dual-motor electric|577|1EV|AWD
+phantom|Rolls-Royce|Phantom|2027|Series II|Sedan|6.75L twin-turbo V12|563|8AT|RWD
+lm|Lexus|LM|2027|350h Luxury|Van|2.4L turbo I4 hybrid|366|6AT|AWD
+century|Toyota|Century|2026|SUV|SUV|3.5L V6 plug-in hybrid|406|CVT|AWD
+mbgls|Mercedes-Maybach|GLS 600|2027|4MATIC|SUV|4.0L twin-turbo V8 mild hybrid|550|9AT|AWD
+mbeqs|Mercedes-Maybach|EQS 680 SUV|2026|Base|SUV|Dual-motor electric|649|1EV|AWD
+mbsl|Mercedes-Maybach|SL 680|2026|Monogram Series|Convertible|4.0L twin-turbo V8|577|9AT|AWD
+mbs680|Mercedes-Maybach|S 680|2027|4MATIC|Sedan|6.0L twin-turbo V12|621|9AT|AWD
+bentewb|Bentley|Bentayga EWB|2027|Mulliner|SUV|4.0L twin-turbo V8|542|8AT|AWD
+spurm|Bentley|Flying Spur|2024|Mulliner W12|Sedan|6.0L twin-turbo W12|626|8DCT|AWD
+dawn|Rolls-Royce|Dawn|2023|Base|Convertible|6.6L twin-turbo V12|563|8AT|RWD
+wraithbb|Rolls-Royce|Wraith|2023|Black Badge|Coupe|6.6L twin-turbo V12|624|8AT|RWD
+cullbb|Rolls-Royce|Cullinan|2027|Black Badge Series II|SUV|6.75L twin-turbo V12|592|8AT|AWD
+slr|Mercedes-Benz|SLR McLaren|2007|Coupe|Coupe|5.4L supercharged V8|617|5AT|RWD
+spectrebb|Rolls-Royce|Spectre|2026|Black Badge|Coupe|Dual-motor electric|659|1EV|AWD
+slrrd|Mercedes-Benz|SLR McLaren|2008|Roadster|Convertible|5.4L supercharged V8|617|5AT|RWD
+rocket900|Brabus|Rocket 900 (S-Class)|2021|One of Ten|Sedan|6.2L twin-turbo V12|888|9AT|AWD
+phantomewb|Rolls-Royce|Phantom|2027|Extended|Sedan|6.75L twin-turbo V12|563|8AT|RWD
+rocket1000|Brabus|Rocket 1000 (AMG GT)|2025|Base|Coupe|4.0L twin-turbo V8 plug-in hybrid|987|9AT|AWD
+venatus|Mansory|Venatus (Urus)|2024|Evo|SUV|4.0L twin-turbo V8|887|8AT|AWD
+mansbent|Mansory|Bentayga Coupé|2023|Base|SUV|4.0L twin-turbo V8|700|8AT|AWD
+brabus900|Brabus|900 Superblack (G 65)|2024|Base|SUV|6.0L twin-turbo V12|888|7AT|4WD
+manscull|Mansory|Coastline (Cullinan)|2024|Base|SUV|6.75L twin-turbo V12|610|8AT|AWD
+gronos|Mansory|Gronos (G 63)|2025|Evo|SUV|4.0L twin-turbo V8|850|9AT|4WD
+mansf9|Mansory|F9XX (SF90)|2024|Base|Coupe|4.0L twin-turbo V8 hybrid|1100|8DCT|AWD
+slr722|Mercedes-Benz|SLR McLaren|2007|722 Edition|Coupe|5.4L supercharged V8|650|5AT|RWD
+landaulet|Mercedes-Maybach|G 650 Landaulet|2018|Base|Convertible SUV|6.0L twin-turbo V12|621|7AT|4WD
+batur|Bentley|Batur|2024|Mulliner|Coupe|6.0L twin-turbo W12|740|8DCT|AWD
+bacalar|Bentley|Bacalar|2021|Mulliner|Convertible|6.0L twin-turbo W12|650|8DCT|AWD
+slrmoss|Mercedes-Benz|SLR|2009|Stirling Moss|Speedster|5.4L supercharged V8|650|5AT|RWD
+exelero|Maybach|Exelero|2005|One-off|Coupe|5.9L twin-turbo V12|690|5AT|RWD
+droptail|Rolls-Royce|Droptail|2024|La Rose Noire|Convertible|6.75L twin-turbo V12|593|8AT|RWD
+mc20|Maserati|MC20|2025|Coupe|Coupe|3.0L twin-turbo V6 (Nettuno)|621|8DCT|RWD
+artura|McLaren|Artura|2027|Base|Coupe|3.0L twin-turbo V6 hybrid|690|8DCT|RWD
+r8|Audi|R8|2024|V10 GT RWD|Coupe|5.2L V10|602|7DCT|RWD
+roma|Ferrari|Roma Spider|2026|Base|Convertible|3.9L twin-turbo V8|612|8DCT|RWD
+urus|Lamborghini|Urus|2027|SE|SUV|4.0L twin-turbo V8 plug-in hybrid|789|8AT|AWD
+750s|McLaren|750S|2026|Coupe|Coupe|4.0L twin-turbo V8|740|7DCT|RWD
+temerario|Lamborghini|Temerario|2027|Base|Coupe|4.0L twin-turbo V8 hybrid|907|8DCT|AWD
+sto|Lamborghini|Huracán|2024|STO|Coupe|5.2L V10|631|7DCT|RWD
+296|Ferrari|296 GTB|2027|Base|Coupe|3.0L twin-turbo V6 hybrid|819|8DCT|RWD
+purosangue|Ferrari|Purosangue|2027|Base|SUV|6.5L V12|715|8DCT|AWD
+amgbs|Mercedes-AMG|GT Black Series|2021|Base|Coupe|4.0L twin-turbo flat-plane V8|720|7DCT|RWD
+12cil|Ferrari|12Cilindri|2027|Base|Coupe|6.5L V12|819|8DCT|RWD
+sf90|Ferrari|SF90 Stradale|2026|Assetto Fiorano|Coupe|4.0L twin-turbo V8 hybrid|986|8DCT|AWD
+svj|Lamborghini|Aventador|2022|SVJ|Coupe|6.5L V12|759|7AMT|AWD
+revuelto|Lamborghini|Revuelto|2027|Base|Coupe|6.5L V12 hybrid|1001|8DCT|AWD
+812c|Ferrari|812 Competizione|2022|Base|Coupe|6.5L V12|819|7DCT|RWD
+gemera|Koenigsegg|Gemera|2026|HV8|Coupe|5.0L twin-turbo V8 hybrid|2300|9MC|AWD
+p1|McLaren|P1|2015|Base|Coupe|3.8L twin-turbo V8 hybrid|903|7DCT|RWD
+918|Porsche|918 Spyder|2015|Weissach Package|Convertible|4.6L V8 hybrid|887|7DCT|AWD
+tuatara|SSC|Tuatara|2023|Base|Coupe|5.9L twin-turbo V8|1750|7AMT|RWD
+w1|McLaren|W1|2026|Base|Coupe|4.0L twin-turbo V8 hybrid|1258|8DCT|RWD
+nevera|Rimac|Nevera|2025|Base|Coupe|Quad-motor electric|1914|1EV|AWD
+battista|Pininfarina|Battista|2024|Base|Coupe|Quad-motor electric|1874|1EV|AWD
+sp3|Ferrari|Daytona SP3|2024|Base|Targa|6.5L V12|829|7DCT|RWD
+speedtail|McLaren|Speedtail|2020|Base|Coupe|4.0L twin-turbo V8 hybrid|1055|7DCT|RWD
+amgone|Mercedes-AMG|ONE|2024|Base|Coupe|1.6L turbo V6 hybrid (F1)|1049|7AMT|AWD
+venom|Hennessey|Venom F5|2024|Coupe|Coupe|6.6L twin-turbo V8|1817|7AMT|RWD
+jesko|Koenigsegg|Jesko|2025|Attack|Coupe|5.0L twin-turbo V8|1600|9MC|RWD
+regera|Koenigsegg|Regera|2022|Base|Coupe|5.0L twin-turbo V8 hybrid|1500|DD|RWD
+t50|Gordon Murray|T.50|2024|Base|Coupe|3.9L V12 (Cosworth)|654|6MT|RWD
+utopia|Pagani|Utopia|2025|Coupe|Coupe|6.0L twin-turbo V12|852|7MT|RWD
+huayrar|Pagani|Huayra R|2022|Track|Coupe|6.0L V12|838|6SEQ|RWD
+valkyrie|Aston Martin|Valkyrie|2023|Coupe|Coupe|6.5L V12 hybrid (Cosworth)|1140|7SEQ|RWD
+sian|Lamborghini|Sián FKP 37|2021|Base|Coupe|6.5L V12 hybrid|808|7AMT|AWD
+chiron|Bugatti|Chiron|2023|Super Sport|Coupe|8.0L quad-turbo W16|1578|7DCT|AWD
+f80|Ferrari|F80|2026|Base|Coupe|3.0L twin-turbo V6 hybrid|1184|8DCT|AWD
+laferrari|Ferrari|LaFerrari|2015|Base|Coupe|6.3L V12 hybrid|950|7DCT|RWD
+tourbillon|Bugatti|Tourbillon|2026|Base|Coupe|8.3L V16 hybrid|1775|8DCT|AWD
+bolide|Bugatti|Bolide|2024|Track|Coupe|8.0L quad-turbo W16|1578|7DCT|AWD
+bus|Volkswagen|Type 2 Samba|1963|21-Window|Bus|1.5L flat-4|40|4MT|RWD
+etype|Jaguar|E-Type|1964|Series 1 Roadster|Convertible|3.8L I6|265|4MT|RWD
+z28|Chevrolet|Camaro|1969|Z/28|Coupe|5.0L V8 (DZ 302)|290|4MT|RWD
+chevelle|Chevrolet|Chevelle|1970|SS 454 LS6|Coupe|7.4L V8 (LS6)|450|4MT|RWD
+splitwin|Chevrolet|Corvette|1963|Split-Window|Coupe|5.4L V8 (327)|340|4MT|RWD
+bronco66|Ford|Bronco|1972|Sport|SUV|4.9L V8 (302)|205|3MT|4WD
+gnx|Buick|GNX|1987|Base|Coupe|3.8L turbo V6|276|4AT|RWD
+shelby67|Shelby|GT500|1967|Fastback|Coupe|7.0L V8 (428)|355|4MT|RWD
+cuda|Plymouth|Hemi 'Cuda|1970|Base|Coupe|7.0L V8 (426 Hemi)|425|4MT|RWD
+toyota2000|Toyota|2000GT|1967|Base|Coupe|2.0L I6|150|5MT|RWD
+gullwing|Mercedes-Benz|300 SL|1955|Gullwing|Coupe|3.0L I6|215|4MT|RWD
+959|Porsche|959|1987|Komfort|Coupe|2.85L twin-turbo flat-6|444|6MT|AWD
+cobra|Shelby|Cobra|1965|427|Roadster|7.0L V8 (427)|425|4MT|RWD
+f40|Ferrari|F40|1990|Base|Coupe|2.9L twin-turbo V8|471|5MT|RWD
+miura|Lamborghini|Miura|1971|SV|Coupe|3.9L V12|380|5MT|RWD
+gt40|Ford|GT40|1966|Mk I|Coupe|4.7L V8 (289)|380|5MT|RWD
+mclf1|McLaren|F1|1995|Base|Coupe|6.1L V12 (BMW S70/2)|618|6MT|RWD
+250gto|Ferrari|250 GTO|1962|Base|Coupe|3.0L V12|296|5MT|RWD
+uhlenhaut|Mercedes-Benz|300 SLR Uhlenhaut Coupé|1955|Base|Coupe|3.0L straight-8|302|5MT|RWD
+generallee|Dodge|Charger|1969|R/T "General Lee"|Coupe|7.2L V8 (440)|375|3AT|RWD
+ffsupra|Toyota|Supra|1994|Turbo (film car)|Coupe|3.0L twin-turbo I6 (2JZ-GTE)|320|6MT|RWD
+eleanor|Ford|Mustang|1967|"Eleanor" Fastback|Coupe|5.8L V8|400|4MT|RWD
+batmobile92|Custom|Batmobile|1992|Batman Returns|Custom|5.7L V8 (Chevy 350)|300|3AT|RWD
+delorean|DeLorean|DMC-12|1981|Time machine|Coupe|2.85L V6 (PRV)|130|5MT|RWD
+bullitt|Ford|Mustang GT|1968|Bullitt hero car|Coupe|6.4L V8 (390)|325|4MT|RWD
+batmobile89|Custom|Batmobile|1989|Batman|Custom|5.7L V8 (Chevy 350)|300|3AT|RWD
+batmobile66|Custom|Batmobile|1966|TV series|Custom|6.4L V8 (Ford 390)|325|3AT|RWD
+db5|Aston Martin|DB5|1965|Goldfinger|Coupe|4.0L I6|282|5MT|RWD
+noire|Bugatti|La Voiture Noire|2021|One-off|Coupe|8.0L quad-turbo W16|1479|7DCT|AWD
+boattail|Rolls-Royce|Boat Tail|2021|Coachbuilt|Convertible|6.75L twin-turbo V12|563|8AT|RWD
+4r|Toyota|4Runner|2026|TRD Pro (6" lift, 35s)|SUV|2.4L turbo I4 hybrid|326|8AT|4WD
+4r2j|Toyota|4Runner|2003|SR5 (2JZ swap, 37s)|SUV|3.0L turbo I6 (2JZ-GTE swap)|650|6MT|4WD
+lc80|Toyota|Land Cruiser|1996|80 Series|SUV|4.5L I6 (1FZ-FE)|212|4AT|4WD
+lc70|Toyota|Land Cruiser|2016|79 Series pickup|Pickup|4.5L twin-turbo V8 diesel|202|5MT|4WD
+gladiator|Jeep|Gladiator|2026|Mojave (3.5" lift, 40s)|Pickup|3.6L V6|285|8AT|4WD
+pw|Ram|2500|2026|Power Wagon (6" lift, 40s)|Pickup|6.4L V8 (HEMI)|410|8AT|4WD
+broncor|Ford|Bronco|2026|Raptor (40s)|SUV|3.0L twin-turbo V6|418|10AT|4WD
+cybercustom|Tesla|Cybertruck|2026|AWD (lifted, 37s)|Pickup|Dual-motor electric|600|1EV|AWD
+h1|AM General|Hummer H1|2006|Alpha (lifted)|SUV|6.6L turbo-diesel V8 (Duramax)|300|5AT|4WD
+k5|Chevrolet|K5 Blazer|1972|Restomod|SUV|6.2L V8 (LS3)|430|6AT|4WD
+bronco1|Ford|Bronco|1974|Restomod|SUV|5.0L V8 (Coyote)|460|10AT|4WD
+g4x4|Mercedes-Benz|G 550 4x4²|2018|Base|SUV|4.0L twin-turbo V8|416|9AT|4WD
+xlp|Brabus|800 Adventure XLP|2023|Base|Pickup|4.0L twin-turbo V8|789|9AT|4WD
+tacotrd|Toyota|Tacoma|2026|TRD Pro (37s, long-travel front)|Pickup|2.4L turbo I4 hybrid|326|8AT|4WD
+tacocummins|Toyota|Tacoma|2015|Cummins swap|Pickup|2.8L turbo-diesel I4 (Cummins R2.8)|200|6AT|4WD
+raptorlt|Ford|F-150 Raptor R|2024|Long travel, Whipple|Pickup|5.2L supercharged V8|900|10AT|4WD
+tacolt|Toyota|Tacoma|2020|Prerunner, long travel|Pickup|6.2L twin-turbo V8 (LS)|750|4AT|RWD
+taco1200|Toyota|Tacoma|2022|Prerunner, 4-link, bypass shocks|Pickup|7.0L twin-turbo V8 (LS)|1200|4AT|RWD
+trxlt|Ram|1500 TRX|2024|Prerunner, long travel|Pickup|6.2L supercharged V8|900|8AT|4WD
+ultra4|Custom|Ultra4 car|2025|King of the Hammers|Buggy|6.2L V8 (LS3)|525|4AT|4WD
+class6100|Custom|Class 6100 truck|2025|Spec|Race truck|6.2L V8 (LS3)|525|4AT|RWD
+tt|Custom|Trophy truck|2025|Class 1|Race truck|7.0L V8 (LS)|900|3AT|RWD
+tt2|Custom|Trophy truck|2025|Class 1 + chase team|Race truck|7.0L V8 (LS)|900|3AT|RWD
+rzr|Polaris|RZR Pro R|2026|Ultimate|UTV|2.0L I4|225|CVT|AWD
+mavr|Can-Am|Maverick R|2026|X rs|UTV|1.0L turbo I3|240|7DCT|AWD
+yxz|Yamaha|YXZ1000R|2026|SS SE|UTV|1.0L I3|110|5SEQ|AWD
+sandrail|Custom|Sand rail|2025|4-seat|Buggy|6.2L V8 (LS3)|525|4SEQ|RWD
+mk-civic03|Honda|Civic|2003|EX|Sedan|1.7L I4|127|4AT|FWD
+mk-rx8|Mazda|RX-8|2005|Grand Touring|Coupe|1.3L rotary (Renesis)|238|6MT|RWD
+mk-crownvic|Ford|Crown Victoria|2008|Police Interceptor|Sedan|4.6L V8|250|4AT|RWD
+mk-ls400|Lexus|LS400|1996|Base|Sedan|4.0L V8 (1UZ-FE)|260|4AT|RWD
+mk-mini|Mini|Cooper S|2012|Base|Hatchback|1.6L turbo I4|181|6MT|FWD
+mk-330i|BMW|330i|2001|Base|Sedan|3.0L I6|225|5MT|RWD
+mk-g35|Infiniti|G35|2004|Coupe|Coupe|3.5L V6|280|6MT|RWD
+mk-c10|Chevrolet|C10|1972|Custom|Pickup|5.7L V8 (350)|165|3AT|RWD
+mk-miata|Mazda|MX-5 Miata|1995|Base|Convertible|1.8L I4|128|5MT|RWD
+mk-corolla|Toyota|Corolla|2006|LE|Sedan|1.8L I4|126|4AT|FWD
+mk-ek|Honda|Civic|1997|CX Hatch|Hatchback|1.6L I4 (D16)|106|5MT|FWD
+mk-xj|Jeep|Cherokee|1999|Sport (3" lift)|SUV|4.0L I6|190|4AT|4WD
+mk-s13|Nissan|240SX|1990|SE Hatch|Hatchback|2.4L I4 (KA24DE)|140|5MT|RWD
+mk-wrxwagon|Subaru|Impreza WRX|2004|Wagon|Wagon|2.0L turbo flat-4|227|5MT|AWD
+mk-is300|Lexus|IS300|2001|Base|Sedan|3.0L I6 (2JZ-GE)|215|5MT|RWD
+mk-accord|Honda|Accord|2010|LX|Sedan|2.4L I4|177|5AT|FWD
+mk-mr2|Toyota|MR2|1985|Base|Coupe|1.6L I4 (4A-GE)|112|5MT|RWD
+mk-silverado|Chevrolet|Silverado 1500|2007|LT|Pickup|5.3L V8|315|4AT|4WD
+mk-tacoma98|Toyota|Tacoma|1998|Base|Pickup|2.7L I4|150|5MT|RWD
+mk-350z|Nissan|350Z|2003|Enthusiast|Coupe|3.5L V6|287|6MT|RWD
+mk-ranger|Ford|Ranger|2008|XLT 4x4|Pickup|4.0L V6|207|5AT|4WD
+mk-4r|Toyota|4Runner|2000|SR5|SUV|3.4L V6 (5VZ-FE)|183|4AT|4WD
+mk-22re|Toyota|Pickup|1987|SR5 4x4|Pickup|2.4L I4 (22RE)|116|5MT|4WD
+mk-g8|Pontiac|G8|2009|GT|Sedan|6.0L V8 (L76)|361|6AT|RWD
+mk-fd|Mazda|RX-7|1993|Touring|Coupe|1.3L twin-turbo rotary|255|5MT|RWD
+mk-crf|Honda|CRF250R|2006|Base|Dirt bike|250cc single|40|5MT|CHAIN
+`;
+const SPECS = {};
+for (const line of SPECS_RAW.trim().split("\n")){ const p = line.split("|"); if (p.length < 10) continue; SPECS[p[0]] = {make:p[1], model:p[2], year:+p[3], trim:p[4], body:p[5], engine:p[6], hp:+p[7], trans:TRANS[p[8]] || p[8], drive:DRIVE[p[9]] || p[9]}; }
+const isVehicle = c => !!c && ["Cars","Off-Road","Marketplace"].includes(c.dept);
+const isDecor = c => !!c && ["Novelty","Guns"].includes(c.dept);
+const isHome = c => !!c && c.dept === "Homes";
+function specOf(c){
+  if (SPECS[c.id]) return SPECS[c.id];
+  const parts = c.name.split(" "), m = /([\d,]+)\s*hp/.exec(c.desc + " " + c.name);
+  return {make:parts[0], model:parts.slice(1).join(" "), year:2027, trim:"Base", body:"—", engine:"—", hp:m ? +m[1].replace(/,/g,"") : 0, trans:"Automatic", drive:"—"};
+}
+const EXT = ["Alpine White","Jet Black","Black Sapphire Metallic","Mineral Gray Metallic","Silver Metallic","Midnight Blue Metallic","Portimao Blue Metallic","Racing Red","Vegas Red Metallic","British Racing Green","Isle of Man Green Metallic","Lava Orange","Sonic Yellow","Frozen Black Matte","Pearl White Tricoat","Chalk","Nardo Gray","Bronze Metallic","Deep Purple Metallic","Burgundy Metallic"];
+const INT = ["Black leather","Black w/ red stitching","Tan leather","Cognac leather","Cream leather","Black Alcantara","Red leather","Gray leather","Black and white two-tone","Navy leather"];
+function hashStr(s){ let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; }
+function rng(seed){ let h = hashStr(seed) || 1; return () => { h ^= h << 13; h >>>= 0; h ^= h >> 17; h ^= h << 5; h >>>= 0; return h / 4294967296; }; }
+function vehInit(o){
+  const c = BYID[o.itemId]; if (!isVehicle(c) || o.veh) return false;
+  const r = rng(o.id), sp = specOf(c), V = "ABCDEFGHJKLMNPRSTUVWXYZ0123456789";
+  let vin = ""; for (let i = 0; i < 17; i++) vin += V[Math.floor(r() * V.length)];
+  let cond, miles;
+  if (c.dept === "Marketplace"){ cond = "Used"; const k = parseInt(String(c.miles || "").replace(/[^\d]/g, ""), 10); miles = k ? k * 1000 : Math.round(80000 + r() * 150000); }
+  else if (c.sub === "Movie & one-offs"){ cond = "Collector, screen-used"; miles = Math.round(r() * 3000); }
+  else if (c.dept === "Off-Road"){ cond = "Custom build"; miles = Math.round(300 + r() * 12000); }
+  else if (sp.year >= 2026){ cond = "New"; miles = Math.round(3 + r() * 30); }
+  else if (sp.year < 1990){ cond = "Restored"; miles = Math.round(15000 + r() * 70000); }
+  else { cond = "Used"; miles = Math.round(1500 + r() * 25000); }
+  o.veh = {ext:EXT[Math.floor(r() * EXT.length)], int:INT[Math.floor(r() * INT.length)], vin, miles, cond};
+  return true;
+}
+function specRows(o){
+  const c = BYID[o.itemId], f = specOf(c), v = o.veh || {}, has = k => (o.mods || []).includes(k);
+  const hpAdd = (o.mods || []).map(k => MODBY[k]).filter(m => m && (m.g === "car" || m.g === "offroad")).reduce((s,m) => s + (m.hp || 0), 0);
+  let engine = f.engine;
+  if (has("car:2jz")) engine = "3.0L twin-turbo I6 (2JZ swap)";
+  if (has("car:ls")) engine = "6.2L V8 (LS3 swap)";
+  const adds = [["car:twin","twin-turbo kit"],["car:turbo","big single turbo"],["car:whipple","Whipple supercharger"],["car:sc","supercharger"],["car:nos","nitrous"],["car:meth","methanol injection"],["car:e85","E85"],["car:tune","ECU tune"],["car:forged","forged internals"]].filter(([k]) => has(k)).map(x => x[1]);
+  if (adds.length) engine += " + " + adds.join(", ");
+  const ext = has("car:candy") ? "Custom candy paint" : has("car:wrap") ? "Custom wrap over " + v.ext : v.ext;
+  const int = [v.int, has("car:seats") ? "racing seats" : "", has("car:cage") ? "roll cage" : "", has("car:star") ? "starlight headliner" : ""].filter(Boolean).join(", ");
+  const susp = [has("car:coil") && "Coilovers", has("car:air") && "Air suspension", has("offroad:lift") && "3–6\" lift", has("offroad:lt") && "Long-travel", has("offroad:bypass") && "Bypass shocks", has("offroad:portals") && "Portal axles"].filter(Boolean).join(", ") || "Factory";
+  const wheels = [has("car:wheels") && "Forged wheels", has("offroad:37s") && "37\" tires on beadlocks", has("offroad:40s") && "40\" tires"].filter(Boolean).join(", ") || "Factory";
+  const body = f.body + (has("car:wide") ? ", widebody" : "") + (has("car:carbon") ? ", full carbon aero" : "");
+  const extras = [has("car:bbk") && "Big brake kit", has("offroad:lockers") && "Front and rear lockers", has("offroad:winch") && "Winch and steel bumper", has("offroad:lights") && "LED light bars", has("offroad:snorkel") && "Snorkel", has("offroad:rtt") && "Rooftop tent", has("car:ppf") && "Paint protection film", has("car:intake") && "Cold air intake", (has("car:catback") || has("car:tiexh") || has("car:headers")) && [has("car:headers") && "long-tube headers", has("car:tiexh") ? "titanium exhaust" : has("car:catback") && "cat-back exhaust"].filter(Boolean).join(" + ")].filter(Boolean).join(", ");
+  return [
+    ["Make", f.make], ["Model", f.model], ["Year", String(f.year)], ["Trim", f.trim],
+    ["Body type", f.body, body], ["Exterior color", v.ext, ext], ["Interior color", v.int, int],
+    ["Mileage", (v.miles || 0).toLocaleString() + " mi"], ["Condition", v.cond], ["VIN", v.vin], ["Stock number", v.vin ? v.vin.slice(-8) : "—"],
+    ["Transmission", f.trans, has("car:trans") ? "Built " + f.trans.toLowerCase() : f.trans], ["Drivetrain", f.drive],
+    ["Engine", f.engine, engine], ["Horsepower", f.hp ? f.hp.toLocaleString() + " hp" : "—", f.hp ? (f.hp + hpAdd).toLocaleString() + " hp" : "—"],
+    ["Suspension", "Factory", susp], ["Wheels & tires", "Factory", wheels], ["Other parts", "None", extras || "None"]
+  ];
+}
+const quickSpec = o => { const f = specOf(BYID[o.itemId]), hp = f.hp + hpOf(o); return [f.year, hp ? hp.toLocaleString() + " hp" : "", f.trans, f.drive].filter(Boolean).join(" · "); };
+
+// ======================= HOMES: garages and display
+function homeCap(h){
+  const c = BYID[h.itemId]; if (!c) return {g:0, d:0};
+  let g = c.icon === "building" ? (c.price > 5e6 ? 2 : 1) : c.price < 4e5 ? 1 : c.price < 1e6 ? 2 : c.price < 3e6 ? 3 : c.price < 1e7 ? 4 : c.price < 3e7 ? 8 : 12;
+  let d = c.price < 1e6 ? 4 : c.price < 1e7 ? 8 : 15;
+  for (const k of h.mods || []){ const m = MODBY[k]; if (m){ g += m.garage || 0; d += m.display || 0; } }
+  return {g, d};
+}
+const homesOwned = () => state.owned.filter(o => isHome(BYID[o.itemId]));
+const placedIn = (h, kind) => state.owned.filter(o => o.loc === h.id && (kind === "g" ? isVehicle(BYID[o.itemId]) : isDecor(BYID[o.itemId])));
+const homeName = h => { const c = BYID[h.itemId]; return c ? c.name : "Home"; };
+function locOf(o){ const h = o.loc && state.owned.find(x => x.id === o.loc); return h || null; }
+function freeHomeFor(o){ const kind = isVehicle(BYID[o.itemId]) ? "g" : "d"; return homesOwned().find(h => placedIn(h, kind).length < homeCap(h)[kind]); }
+
+const HOME_X = {garage:{garage:20}, lift:{garage:2}, garage4:{garage:4}, museum:{garage:15}, trophy:{display:10}, vault:{display:15}, gallery:{display:20}};
+for (const [k, x] of Object.entries(HOME_X)) if (MODBY["home:" + k]) Object.assign(MODBY["home:" + k], x);
+for (const g of Object.keys(MODS)) MODS[g].items.sort((a,b) => a[2] - b[2]);
+
+DEPT["Marketplace"].hidden = false; DEPT["Marketplace"].k = "Marketplace";
+const DEPT_LABEL = k => k === "Marketplace" ? "Curbside Market" : k;
+
+// ======================= STATE
+const $ = id => document.getElementById(id);
+const blank = () => ({v:4, checking:0, savings:0, interestEarned:0, totalEarned:0, tasks:[], owned:[], log:[], cards:[], credit:{onTime:0, late:0}, accrued:"", streak:{count:0,last:""}, daily:{day:"",count:0,paid:false}, dream:"", sound:true});
+let state = blank(), docRef = null, saveTimer = null, lastJSON = "";
+const LS = "empire-ledger-v1";
+
+const money = n => (n < 0 ? "-" : "") + "$" + Math.abs(Math.round(n)).toLocaleString("en-US");
+const cents = n => (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+const short = n => { const a = Math.abs(n), s = n < 0 ? "-" : ""; if (a >= 1e9) return s+"$"+ +(a/1e9).toFixed(2)+"B"; if (a >= 1e6) return s+"$"+ +(a/1e6).toFixed(2)+"M"; if (a >= 1e5) return s+"$"+ +(a/1e3).toFixed(0)+"K"; return money(n); };
+const ds = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ds(d); };
+const todayStr = () => ds(new Date());
+const yestStr = () => addDays(todayStr(), -1);
+const dayDiff = due => Math.round((parse(due) - parse(todayStr()))/864e5);
+const dueLabel = due => { const n = dayDiff(due); if (n === 0) return "Due today"; if (n === 1) return "Due tomorrow"; if (n === -1) return "1 day late"; if (n < 0) return (-n)+" days late"; return "Due " + parse(due).toLocaleDateString("en-US", n < 7 ? {weekday:"long"} : {month:"short",day:"numeric"}); };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const r2 = n => Math.round(n * 100) / 100;
+const val = o => o.price + (o.mods || []).reduce((s,k) => s + ((MODBY[k] || {}).price || 0), 0);
+const hpOf = o => (o.mods || []).reduce((s,k) => s + ((MODBY[k] || {}).hp || 0), 0);
+const assetsVal = () => state.owned.reduce((s,o) => s + val(o), 0);
+const debt = () => state.cards.reduce((s,c) => s + c.bal, 0);
+const cashTotal = () => state.checking + state.savings;
+const worth = () => cashTotal() + assetsVal() - debt();
+const level = () => levelOf(state.totalEarned);
+const liveStreak = () => (state.streak.last === todayStr() || state.streak.last === yestStr()) ? state.streak.count : 0;
+const nextStreak = () => state.streak.last === todayStr() ? state.streak.count : state.streak.last === yestStr() ? state.streak.count + 1 : 1;
+const tint = dept => { const c = DEPT[dept] ? DEPT[dept].c : "--c-mod"; return `background:color-mix(in srgb,var(${c}) 14%,transparent);color:var(${c})`; };
+const totalLimit = () => state.cards.reduce((s,c) => s + CARD[c.t].limit, 0);
+const util = () => totalLimit() ? debt() / totalLimit() : 0;
+function creditScore(){
+  const u = util(), pen = u > .3 ? Math.min(140, (u - .3) * 200) : 0;
+  return Math.round(Math.max(300, Math.min(850, 680 + Math.min(state.credit.onTime * 8, 150) - state.credit.late * 60 - pen)));
+}
+const pastDueCards = () => state.cards.filter(c => c.pastDue);
+const cardAvail = c => Math.max(0, CARD[c.t].limit - c.bal);
+const cardUsable = c => !c.pastDue && cardAvail(c) > 0;
+function payoutFor(t){
+  const base = PAY[t.size] || PAY.standard; let timing = 1, why = "";
+  if (t.due){ const n = dayDiff(t.due); if (n > 0){timing = EARLY; why = "early bonus";} else if (n === 0) why = "on time"; else {timing = .5; why = "late";} }
+  const mult = (1 + Math.min(nextStreak(), STREAK_CAP) * STREAK_BONUS) * (1 + (level() - 1) * LVL_BONUS);
+  return {amt: Math.round(base * timing * mult / 10) * 10, why};
+}
+function log(kind, label, amt, acct, dept){ state.log.unshift({t:Date.now(), k:kind, l:label, a:r2(amt), acct:acct || "chk", d:dept || ""}); if (state.log.length > 400) state.log.length = 400; }
+const acctName = a => a === "chk" ? "Checking" : a === "sav" ? "Savings" : (() => { const c = state.cards.find(x => x.id === a); return c ? CARD[c.t].name + " ••" + c.last4 : "Card"; })();
+
+function normalize(d){
+  const s = blank(); if (!d || typeof d !== "object") return s;
+  s.checking = Number(d.checking ?? d.cash) || 0; s.savings = Number(d.savings) || 0; s.interestEarned = Number(d.interestEarned) || 0;
+  s.totalEarned = Number(d.totalEarned) || 0;
+  s.tasks = Array.isArray(d.tasks) ? d.tasks.filter(t => t && t.id && t.title) : [];
+  s.owned = Array.isArray(d.owned) ? d.owned.filter(o => o && o.itemId).map(o => ({...o, mods:Array.isArray(o.mods) ? o.mods : [], loc:o.loc || ""})) : [];
+  s.owned.forEach(vehInit);
+  s.log = Array.isArray(d.log) ? d.log.filter(x => x && x.t).map(x => ({...x, acct:x.acct || "chk"})) : [];
+  s.cards = Array.isArray(d.cards) ? d.cards.filter(c => c && CARD[c.t]).map(c => ({id:c.id, t:c.t, last4:c.last4 || "0000", bal:Number(c.bal)||0, due:c.due || "", min:Number(c.min)||0, paid:Number(c.paid)||0, pastDue:!!c.pastDue, opened:c.opened || 0})) : [];
+  if (d.credit) s.credit = {onTime:Number(d.credit.onTime)||0, late:Number(d.credit.late)||0};
+  s.accrued = typeof d.accrued === "string" ? d.accrued : "";
+  if (d.streak) s.streak = {count:Number(d.streak.count)||0, last:String(d.streak.last||"")};
+  if (d.daily) s.daily = {day:String(d.daily.day||""), count:Number(d.daily.count)||0, paid:!!d.daily.paid};
+  s.dream = typeof d.dream === "string" ? d.dream : ""; s.sound = d.sound !== false;
+  return s;
+}
+let dirty = false, saveSeq = 0;
+function save(){
+  const json = JSON.stringify(state); lastJSON = json;
+  try { localStorage.setItem(LS, json); } catch(e) {}
+  if (!docRef) return;
+  clearTimeout(saveTimer); dirty = true; const my = ++saveSeq;
+  saveTimer = setTimeout(() => docRef.set(JSON.parse(lastJSON)).then(() => setSync("Synced to your account")).catch(e => setSync("Couldn't sync (" + (e && e.code || "error") + "). Saved in this browser.")).finally(() => { if (my === saveSeq) dirty = false; }), 400);
+}
+const setSync = t => { $("sync").textContent = t; };
+try { const raw = localStorage.getItem(LS); if (raw) state = normalize(JSON.parse(raw)); } catch(e) {}
+
+// ======================= DAILY BANKING: interest, statements, late fees
+function openStatement(c, day, extra){
+  if (c.bal <= 0.005){ c.bal = 0; c.due = ""; c.min = 0; c.paid = 0; return; }
+  c.min = r2(Math.min(c.bal, Math.max(100, c.bal * .05)) + (extra || 0)); c.due = addDays(day, 7); c.paid = 0;
+}
+function accrue(){
+  const today = todayStr();
+  if (!state.accrued){ state.accrued = today; return false; }
+  let changed = false, day = state.accrued, n = 0, savInt = 0;
+  const cardInt = {}, lateEvents = [];
+  while (day < today && n < 400){
+    day = addDays(day, 1); n++;
+    const si = state.savings * SAV_APY / 365; state.savings += si; savInt += si;
+    for (const c of state.cards){
+      if (c.bal > 0){ const ci = c.bal * CARD[c.t].apr / 365; c.bal += ci; cardInt[c.id] = (cardInt[c.id] || 0) + ci; }
+      if (c.due && day > c.due){
+        if (c.paid >= c.min - .005){ state.credit.onTime++; c.pastDue = false; openStatement(c, day); }
+        else {
+          const unpaid = c.min - c.paid, fee = r2(Math.max(40, c.bal * .05));
+          c.bal += fee; state.credit.late++; c.pastDue = true;
+          lateEvents.push([c, fee]); openStatement(c, day, unpaid);
+        }
+      } else if (!c.due && c.bal > 0) openStatement(c, day);
+    }
+  }
+  state.accrued = today;
+  if (savInt >= .01){ state.interestEarned += savInt; log("interest", "Savings interest", savInt, "sav"); changed = true; }
+  for (const [id, v] of Object.entries(cardInt)) if (v >= .01){ log("charge", "Interest charge", -v, id); changed = true; }
+  for (const [c, fee] of lateEvents){ log("fee", "Late fee · missed minimum payment", -fee, c.id); changed = true; }
+  if (lateEvents.length) setTimeout(() => banner("Payment missed <span>Card frozen</span>"), 400);
+  return changed || n > 0;
+}
+
+// ======================= DB
+async function connect(){
+  if (!window.claude || !window.claude.use){ setSync("Saved on this device. Works offline."); $("saveBackupBtn").hidden = false; return; }
+  const db = await window.claude.use("db");
+  if (!db){ setSync("Saved in this browser only. Sign in to sync across devices."); return; }
+  docRef = db.doc("ledger/main"); let first = true;
+  docRef.onSnapshot(snap => {
+    if ((snap.metadata && snap.metadata.hasPendingWrites) || dirty) return;
+    if (!snap.exists){ if (first) save(); first = false; setSync("Synced to your account"); render(); return; }
+    const inc = normalize(snap.data()), json = JSON.stringify(inc);
+    if (json !== lastJSON){ state = inc; lastJSON = json; if (accrue()) save(); try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){} render(); }
+    else if (first && accrue()){ save(); render(); }
+    first = false;
+    setSync("Synced to your account");
+  }, e => setSync("Sync paused (" + (e && e.code || "error") + "). Saved in this browser."));
+}
+
+// ======================= FX
+let actx = null;
+function tone(f, t0, dur, type, vol){ const o = actx.createOscillator(), g = actx.createGain(); o.type = type; o.frequency.setValueAtTime(f, actx.currentTime + t0); g.gain.setValueAtTime(0, actx.currentTime + t0); g.gain.linearRampToValueAtTime(vol, actx.currentTime + t0 + .01); g.gain.exponentialRampToValueAtTime(.001, actx.currentTime + t0 + dur); o.connect(g).connect(actx.destination); o.start(actx.currentTime + t0); o.stop(actx.currentTime + t0 + dur + .05); }
+function sfx(k){ if (!state.sound) return; try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+  if (k === "cash"){ tone(1318,0,.12,"square",.06); tone(1760,.08,.35,"square",.06); tone(2637,.1,.4,"triangle",.04); }
+  else if (k === "buy"){ [523,659,784,1046].forEach((f,i) => tone(f, i*.07, .25, "triangle", .08)); }
+  else if (k === "level"){ [392,523,659,784,1046].forEach((f,i) => tone(f, i*.09, .35, "square", .05)); }
+  else if (k === "bad"){ tone(220,0,.25,"sawtooth",.05); tone(165,.15,.35,"sawtooth",.05); }
+  else tone(880,0,.05,"sine",.04); } catch(e) {} }
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = $("fx"), cx = cv.getContext("2d"); let parts = [], raf = 0;
+function coins(x, y, n){ if (RM) return; cv.width = innerWidth*devicePixelRatio; cv.height = innerHeight*devicePixelRatio;
+  for (let i = 0; i < n; i++){ const a = -Math.PI/2 + (Math.random()-.5)*2.2, v = 5 + Math.random()*8; parts.push({x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, r:Math.random()*6, s:5+Math.random()*5, life:80+Math.random()*30, g:Math.random()<.5}); }
+  if (!raf) raf = requestAnimationFrame(step); }
+function step(){ const d = devicePixelRatio; cx.clearRect(0,0,cv.width,cv.height); parts = parts.filter(p => p.life-- > 0);
+  for (const p of parts){ p.vy += .35; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += .15; cx.save(); cx.translate(p.x*d, p.y*d); cx.globalAlpha = Math.min(1, p.life/25);
+    if (p.g){ cx.fillStyle = "#D9A21B"; cx.strokeStyle = "#8A6410"; cx.lineWidth = 1.5*d; cx.beginPath(); cx.ellipse(0,0,p.s*d,p.s*d*Math.abs(Math.cos(p.r*2))+1,0,0,Math.PI*2); cx.fill(); cx.stroke(); }
+    else { cx.rotate(p.r); cx.fillStyle = "#38C98A"; cx.fillRect(-p.s*d, -p.s*d*.45, p.s*2*d, p.s*.9*d); }
+    cx.restore(); }
+  raf = parts.length ? requestAnimationFrame(step) : 0; if (!raf) cx.clearRect(0,0,cv.width,cv.height); }
+function floatText(x, y, t){ if (RM) return; const d = document.createElement("div"); d.className = "float"; d.textContent = t; d.style.left = x+"px"; d.style.top = (y-20)+"px"; document.body.appendChild(d); setTimeout(() => d.remove(), 1200); }
+function banner(html){ const d = document.createElement("div"); d.className = "banner"; d.innerHTML = html; document.body.appendChild(d); setTimeout(() => d.remove(), 2300); }
+function bump(){ const c = $("nwV"); c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump"); }
+let toastTimer, undoFn = null;
+function toast(msg, undo){ $("toastMsg").textContent = msg; undoFn = undo || null; $("toastUndo").hidden = !undo; $("toast").classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").classList.remove("show"); undoFn = null; }, 4500); }
+$("toastUndo").onclick = () => { if (undoFn) undoFn(); $("toast").classList.remove("show"); undoFn = null; };
+const at = el => { const r = el && el.isConnected ? el.getBoundingClientRect() : {left:innerWidth/2, top:innerHeight/2, width:0, height:0}; return [r.left + r.width/2, r.top + r.height/2]; };
+const snap = () => JSON.stringify(state);
+const restore = s => { state = normalize(JSON.parse(s)); save(); render(); };
+
+// ======================= ACTIONS
+function applyToCard(c, amt){ const pay = Math.min(amt, c.bal); c.bal = r2(c.bal - pay); c.paid = r2(c.paid + pay);
+  if (c.pastDue && c.paid >= c.min - .005){ c.pastDue = false; }
+  if (c.bal <= .005){ c.bal = 0; c.due = ""; c.min = 0; c.paid = 0; c.pastDue = false; }
+  return pay; }
+function complete(id, el){
+  const t = state.tasks.find(x => x.id === id); if (!t) return;
+  if (t.done) return uncomplete(id);
+  const before = snap(), lv0 = level(), p = payoutFor(t);
+  t.done = true; t.doneAt = Date.now(); t.earned = p.amt; state.totalEarned += p.amt;
+  let toChk = p.amt, garn = 0;
+  const pd = pastDueCards()[0];
+  if (pd){ garn = applyToCard(pd, Math.round(p.amt * GARNISH)); toChk -= garn; }
+  state.checking += toChk; log("earn", t.title, p.amt, "chk", p.why);
+  if (garn) log("garnish", "Auto-payment from payout (past due)", -garn, "chk"), log("payment", "Payment received", garn, pd.id);
+  const today = todayStr(); state.streak = {count:nextStreak(), last:today};
+  if (state.daily.day !== today) state.daily = {day:today, count:0, paid:false};
+  state.daily.count++;
+  let bonus = false;
+  if (state.daily.count >= DAILY_GOAL && !state.daily.paid){ state.daily.paid = true; state.checking += DAILY_BONUS; state.totalEarned += DAILY_BONUS; log("bonus", "Daily goal bonus", DAILY_BONUS, "chk"); bonus = true; }
+  save(); bump(); sfx("cash");
+  const row = el && el.closest && el.closest(".task");
+  if (row && !RM){ row.classList.add("done", "leaving"); setTimeout(render, 500); } else render();
+  const [x, y] = at(el); coins(x, y, p.amt >= PAY.big ? 90 : 40); floatText(x, y, "+" + short(p.amt));
+  toast("Deposited " + money(p.amt) + (garn ? " · " + money(garn) + " went to your past-due card" : p.why ? " · " + p.why : ""), () => restore(before));
+  if (bonus) setTimeout(() => { banner("Daily goal hit <span>+" + short(DAILY_BONUS) + "</span>"); coins(innerWidth/2, 120, 60); }, 600);
+  const lv = level(); if (lv > lv0) setTimeout(() => { banner("Level up <span>Level " + lv + "</span> · +" + Math.round((lv-1)*LVL_BONUS*100) + "% pay"); sfx("level"); coins(innerWidth/2, 120, 90); }, bonus ? 2400 : 600);
+}
+function uncomplete(id){
+  const t = state.tasks.find(x => x.id === id); if (!t || !t.done) return;
+  if (state.checking < t.earned){ toast("Not enough in checking to reverse that payout."); return; }
+  state.checking -= t.earned; state.totalEarned -= t.earned; log("reverse", "Reversed: " + t.title, -t.earned, "chk");
+  t.done = false; t.earned = 0; delete t.doneAt; save(); render(); toast("Moved back to your list. Payout reversed.");
+}
+function remove(id){
+  const i = state.tasks.findIndex(x => x.id === id); if (i < 0) return;
+  const [t] = state.tasks.splice(i, 1); save(); render();
+  toast("Deleted “" + (t.title.length > 28 ? t.title.slice(0,28) + "…" : t.title) + "”", () => { state.tasks.splice(i, 0, t); save(); render(); });
+}
+function charge(src, amt){
+  if (src === "chk"){ if (state.checking < amt) return false; state.checking -= amt; return true; }
+  const c = state.cards.find(x => x.id === src); if (!c || !cardUsable(c) || cardAvail(c) < amt) return false;
+  c.bal = r2(c.bal + amt); if (!c.due) openStatement(c, todayStr()); return true;
+}
+function canPay(amt){ return state.checking >= amt || state.cards.some(c => cardUsable(c) && cardAvail(c) >= amt); }
+function doBuy(itemId, src){
+  const it = BYID[itemId]; if (!it) return;
+  if (it.dept === "Marketplace" && state.owned.some(o => o.itemId === itemId)) return;
+  const before = snap();
+  if (!charge(src, it.price)){ toast("That account can't cover it."); return; }
+  const no = {id:uid(), itemId, price:it.price, boughtAt:Date.now(), mods:[], loc:""}; state.owned.push(no); vehInit(no);
+  let placed = ""; if (isVehicle(it) || isDecor(it)){ const h = freeHomeFor(no); if (h){ no.loc = h.id; placed = (isVehicle(it) ? " · parked at " : " · displayed at ") + homeName(h); } }
+  log("buy", it.name, -it.price, src, it.dept);
+  if (state.dream === itemId) state.dream = "";
+  closeSheet(); save(); render(); bump(); sfx("buy"); coins(innerWidth/2, innerHeight/2, 50);
+  toast("Purchased " + it.name + (src !== "chk" ? " on credit" : "") + placed, () => restore(before));
+}
+function doMod(oid, key, src){
+  const o = state.owned.find(x => x.id === oid), m = MODBY[key]; if (!o || !m || o.mods.includes(key)) return;
+  const it = BYID[o.itemId];
+  if (!charge(src, m.price)){ toast("That account can't cover it."); return; }
+  o.mods.push(key); log("mod", m.name + " · " + (it ? it.name : ""), -m.price, src, "mod");
+  save(); render(); sfx("buy"); coins(innerWidth/2, innerHeight/2, 25);
+  toast("Installed " + m.name + (m.hp ? " · +" + m.hp + " hp" : "")); openModSheet(oid);
+}
+let armed = null;
+function sell(oid){
+  if (armed !== oid){ armed = oid; renderAssets(); setTimeout(() => { if (armed === oid){ armed = null; renderAssets(); } }, 3000); return; }
+  armed = null; const o = state.owned.find(x => x.id === oid); if (!o) return;
+  const it = BYID[o.itemId], back = Math.round(val(o) * SELL_RATE);
+  state.owned = state.owned.filter(x => x.id !== oid); state.owned.forEach(x => { if (x.loc === oid) x.loc = ""; }); state.checking += back; log("sell", "Sold " + (it ? it.name : "item"), back, "chk", it && it.dept);
+  save(); render(); toast("Sold for " + money(back) + ". Deposited to checking.");
+}
+function pin(itemId){ state.dream = state.dream === itemId ? "" : itemId; save(); render(); if (state.dream) toast("Saved as your goal. Track it on Home."); }
+function openCard(t){
+  const p = CARD[t]; if (state.cards.some(c => c.t === t)) return;
+  if (creditScore() < p.score || level() < p.lvl){ toast("Not approved yet. Raise your score or level."); sfx("bad"); return; }
+  const c = {id:"cc_" + uid(), t, last4:String(1000 + Math.floor(Math.random()*9000)), bal:0, due:"", min:0, paid:0, pastDue:false, opened:Date.now()};
+  state.cards.push(c); log("open", "Opened " + p.name + " · " + short(p.limit) + " limit", 0, c.id);
+  save(); render(); sfx("level"); banner("Approved <span>" + p.name + "</span>");
+}
+function payCard(id, amt){
+  const c = state.cards.find(x => x.id === id); amt = r2(Math.min(amt, c ? c.bal : 0, state.checking)); if (!c || amt <= 0) return;
+  state.checking -= amt; const was = c.pastDue; applyToCard(c, amt);
+  log("payment", "Card payment", -amt, "chk"); log("payment", "Payment received", amt, c.id);
+  closeSheet(); save(); render(); sfx("cash");
+  toast(was && !c.pastDue ? "Caught up. Card unfrozen." : c.bal === 0 ? "Paid in full." : "Paid " + cents(amt) + ".");
+}
+function transfer(dir, amt){
+  amt = r2(amt); if (!(amt > 0)) return;
+  if (dir === "toSav"){ if (state.checking < amt) return; state.checking -= amt; state.savings += amt; log("xfer", "Transfer to savings", -amt, "chk"); log("xfer", "Transfer from checking", amt, "sav"); }
+  else { if (state.savings < amt) return; state.savings -= amt; state.checking += amt; log("xfer", "Transfer to checking", -amt, "sav"); log("xfer", "Transfer from savings", amt, "chk"); }
+  closeSheet(); save(); render(); sfx("tick"); toast("Moved " + cents(amt) + (dir === "toSav" ? " to savings" : " to checking"));
+}
+
+// ======================= SHEETS
+let sheet = null;
+function showSheet(head, body){ $("sheetHead").innerHTML = head; $("sheetBody").innerHTML = body; $("scrim").hidden = false; }
+function closeSheet(){ sheet = null; $("scrim").hidden = true; }
+$("scrim").addEventListener("click", e => { if (e.target === $("scrim")) closeSheet(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sheet) closeSheet(); });
+const closeBtn = '<button class="iconbtn" data-act="close" aria-label="Close">✕</button>';
+function srcOptions(amt){
+  const opts = [{id:"chk", name:"Checking", sub:"Available " + cents(state.checking), ok:state.checking >= amt, ico:'<div class="ico round" style="background:var(--brand-soft);color:var(--brand)">' + svg("card") + '</div>'}];
+  for (const c of state.cards){ const p = CARD[c.t];
+    opts.push({id:c.id, name:p.name + " ••" + c.last4, sub:c.pastDue ? "Frozen: payment past due" : "Available credit " + money(cardAvail(c)) + " · " + (p.apr*100).toFixed(2) + "% APR", ok:cardUsable(c) && cardAvail(c) >= amt, ico:`<div class="minicard" style="background:${p.bg}"></div>`}); }
+  return opts;
+}
+function payPicker(amt, pre){
+  const opts = srcOptions(amt), first = opts.find(o => o.ok); sheet.src = (opts.find(o => o.id === sheet.src && o.ok) || first || {}).id;
+  return `<div class="pad"><span class="lbl">Pay with</span>${opts.map(o => `<button class="payopt" data-act="pick" data-src="${o.id}" aria-pressed="${o.id === sheet.src}"${o.ok ? "" : " disabled"}>${o.ico}<div style="min-width:0"><div style="font-weight:700">${esc(o.name)}</div><div class="lbl">${esc(o.sub)}</div></div><div class="lbl">${o.ok ? "" : "Not enough"}</div></button>`).join("")}
+  ${sheet.src && sheet.src !== "chk" ? (() => { const c = state.cards.find(x => x.id === sheet.src), w = amt * CARD[c.t].apr / 52; return `<div class="alert warn" style="margin:0"><div>On credit this costs about <b style="display:inline">${money(w)} a week</b> in interest until you pay it off. Minimum payments come due every 7 days.</div></div>`; })() : ""}
+  ${!opts.some(o => o.ok) ? `<div class="alert" style="margin:0"><div><b>Not enough money</b>Finish tasks, move money from savings, or open a card in Money.</div></div>` : ""}
+  <button class="btn big wide" data-act="${pre}" ${sheet.src ? "" : "disabled"}>Confirm · ${money(amt)}</button></div>`;
+}
+function openBuySheet(itemId){
+  const it = BYID[itemId]; if (!it) return; sheet = {kind:"buy", id:itemId, src:sheet && sheet.src};
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div class="row" style="gap:10px;flex-wrap:nowrap;min-width:0"><div class="ico" style="${tint(it.dept)}">${svg(it.icon)}</div><div style="min-width:0"><h2 id="sheetTitle">${esc(it.name)}</h2><div class="lbl">${esc(it.desc)}</div></div></div>${closeBtn}</div><div style="font-size:26px;font-weight:800" class="num">${money(it.price)}</div>${isVehicle(it) ? (() => { const f = specOf(it); return `<div class="kv" style="font-size:13px"><div><span class="lbl">Year</span><b>${f.year}</b></div><div><span class="lbl">Engine</span><b>${esc(f.engine)}</b></div><div><span class="lbl">Horsepower</span><b>${f.hp ? f.hp.toLocaleString() + " hp" : "—"}</b></div><div><span class="lbl">Transmission</span><b>${esc(f.trans)}</b></div><div><span class="lbl">Drivetrain</span><b>${esc(f.drive)}</b></div><div><span class="lbl">Body type</span><b>${esc(f.body)}</b></div></div>`; })() : ""}`, payPicker(it.price, "confirmBuy"));
+}
+function openModSheet(oid){
+  const o = state.owned.find(x => x.id === oid); if (!o) return closeSheet();
+  sheet = {kind:"mods", oid}; const c = BYID[o.itemId], d = DEPT[c.dept];
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div class="row" style="gap:10px;flex-wrap:nowrap;min-width:0"><div class="ico" style="${tint(c.dept)}">${svg(c.icon)}</div><div style="min-width:0"><h2 id="sheetTitle">${esc(c.name)}</h2><div class="lbl">Value ${money(val(o))}${isVehicle(c) && specOf(c).hp ? " · " + (specOf(c).hp + hpOf(o)).toLocaleString() + " hp now" : ""}${isHome(c) ? " · Garage " + homeCap(o).g + " · Display " + homeCap(o).d : ""}</div></div></div>${closeBtn}</div>${isVehicle(c) ? `<div class="row" style="gap:8px"><button class="btn sm ghost" data-act="specs" data-id="${o.id}">View specs</button></div>` : isHome(c) ? `<div class="row" style="gap:8px"><button class="btn sm ghost" data-act="home" data-id="${o.id}">Garage and display</button></div>` : ""}`,
+    d.mods.map(g => `<div class="modgroup"><h3>${MODS[g].label}</h3></div>` + MODS[g].items.map(m => { const key = g + ":" + m[0], has = o.mods.includes(key), ok = canPay(m[2]);
+      return `<div class="it"><div class="ico" style="background:var(--sunk);color:var(--c-mod)">${svg(has ? "check" : g === "home" ? "house" : "wrench")}</div><div style="min-width:0"><div class="nm">${esc(m[1])}</div><div class="ds">${m[3] ? "+" + m[3] + " hp · " : ""}Adds ${short(m[2])} to value</div></div><div class="right"><div class="pr num">${money(m[2])}</div>${has ? '<span class="chip green">Installed</span>' : `<button class="btn sm${ok ? "" : ""}" data-act="modbuy" data-key="${key}"${ok ? "" : " disabled"}>Install</button>`}</div></div>`; }).join("")).join("") + '<div style="height:16px"></div>');
+}
+function openModPay(key, src){
+  const m = MODBY[key]; sheet = {kind:"modpay", oid:sheet.oid, key, src:src || null};
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div><h2 id="sheetTitle">${esc(m.name)}</h2><div class="lbl">${esc((BYID[(state.owned.find(x => x.id === sheet.oid)||{}).itemId]||{}).name || "")}</div></div>${closeBtn}</div><div style="font-size:26px;font-weight:800" class="num">${money(m.price)}</div>`, payPicker(m.price, "confirmMod"));
+}
+function amountSheet(title, sub, max, action, quick){
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div><h2 id="sheetTitle">${title}</h2><div class="lbl">${sub}</div></div>${closeBtn}</div>`,
+    `<div class="pad"><label class="amtin"><span>$</span><input id="amt" inputmode="decimal" placeholder="0.00" aria-label="Amount"></label><div class="quick">${quick.map(([l,v]) => `<button class="btn sm ghost" data-act="setamt" data-v="${r2(v)}">${l} · ${cents(v)}</button>`).join("")}</div><button class="btn big wide" data-act="${action}">Confirm</button><div class="lbl">Max ${cents(max)}</div></div>`);
+  setTimeout(() => { const i = $("amt"); if (i) i.focus(); }, 50);
+}
+function openTransfer(dir){
+  sheet = {kind:"xfer", dir};
+  const max = dir === "toSav" ? state.checking : state.savings;
+  amountSheet(dir === "toSav" ? "Move to savings" : "Move to checking", (dir === "toSav" ? "From checking · " : "From savings · ") + cents(max) + " available", max, "confirmXfer", [["25%", max*.25],["50%", max*.5],["All", max]].filter(q => q[1] > 0));
+}
+function openPay(id){
+  const c = state.cards.find(x => x.id === id); if (!c) return; sheet = {kind:"pay", id};
+  const max = Math.min(c.bal, state.checking), due = Math.max(0, c.min - c.paid);
+  const q = []; if (due > 0) q.push([c.pastDue ? "Past due" : "Minimum", Math.min(due, max)]); q.push(["Full balance", max]);
+  amountSheet("Pay " + CARD[c.t].name, "From checking · " + cents(state.checking) + " available · Balance " + cents(c.bal), max, "confirmPay", q.filter(x => x[1] > 0));
+}
+const backupCode = () => "BOL1:" + btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+const amtVal = () => { const v = parseFloat(($("amt") || {}).value); return isFinite(v) ? v : 0; };
+
+// ======================= NAV
+let tab = "home", dept = "Cars", sub = "All", q = "", sort = "asc", limit = 40, newSize = "standard";
+function go(t){
+  tab = t; document.querySelectorAll(".tb").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === t || (t === "activity" && x.dataset.tab === "home")));
+  ["home","money","tasks","shop","assets","activity"].forEach(k => $("v-"+k).hidden = k !== t);
+  render(); scrollTo({top:0});
+}
+document.querySelectorAll(".tb").forEach(b => b.onclick = () => { sfx("tick"); go(b.dataset.tab); });
+$("q").addEventListener("input", e => { q = e.target.value.trim().toLowerCase(); limit = 40; renderShop(); });
+$("sort").addEventListener("change", e => { sort = e.target.value; renderShop(); });
+$("soundBtn").onclick = () => { state.sound = !state.sound; save(); renderTop(); sfx("tick"); };
+$("f-due").addEventListener("input", renderSizes);
+$("addForm").addEventListener("submit", e => {
+  e.preventDefault(); const title = $("f-title").value.trim(); if (!title) return;
+  state.tasks.push({id:uid(), title, cat:$("f-cat").value, size:newSize, due:$("f-due").value || "", done:false, earned:0, created:Date.now()});
+  $("f-title").value = ""; $("f-due").value = ""; save(); render(); sfx("tick"); $("f-title").focus();
+});
+
+// ======================= RENDER
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+const SPK = on => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/>${on ? '<path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>' : '<path d="M17 9l5 6M22 9l-5 6"/>'}</svg>`;
+const HEART = '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.8A5.2 5.2 0 0 1 12 6a5.2 5.2 0 0 1 9.3 5.2C19 15.6 12 20 12 20z"/></svg>';
+const WARN = '<svg viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>';
+
+function renderTop(){
+  const h = new Date().getHours(); $("hello").textContent = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  $("lvlPill").innerHTML = "<i></i>Level " + level();
+  $("soundBtn").innerHTML = SPK(state.sound); $("soundBtn").setAttribute("aria-label", state.sound ? "Mute sounds" : "Turn sounds on");
+  const open = state.tasks.filter(t => !t.done).length; $("n-tasks").hidden = !open; $("n-tasks").textContent = open;
+  $("n-money").hidden = !pastDueCards().length && !state.cards.some(c => c.due && dayDiff(c.due) <= 1 && c.paid < c.min);
+}
+function debtAlert(){
+  const pd = pastDueCards();
+  if (pd.length){ const c = pd[0]; return `<div class="alert">${WARN}<div><b>${CARD[c.t].name} is past due</b>Pay ${cents(Math.max(0, c.min - c.paid))} to unfreeze it. Until then, half of every task payout goes to this card.</div></div>`; }
+  const soon = state.cards.filter(c => c.due && c.paid < c.min - .005).sort((a,b) => a.due.localeCompare(b.due))[0];
+  if (soon && dayDiff(soon.due) <= 2) return `<div class="alert warn">${WARN}<div><b>Payment due ${dayDiff(soon.due) <= 0 ? "today" : dayDiff(soon.due) === 1 ? "tomorrow" : "in 2 days"}</b>${CARD[soon.t].name} minimum: ${cents(soon.min - soon.paid)}. Miss it and the card freezes.</div></div>`;
+  return "";
+}
+function accRow(icon, title, sub, bal, balSub, act){ return `<button class="acc" data-goto="${act}">${icon}<div style="min-width:0"><div class="t">${title}</div><div class="s">${sub}</div></div><div class="b num">${bal}${balSub ? `<small>${balSub}</small>` : ""}</div></button>`; }
+function renderHome(){
+  $("nwV").textContent = cents(worth()); $("cashV").textContent = short(cashTotal()); $("assetV").textContent = short(assetsVal());
+  $("debtV").textContent = debt() ? "-" + short(debt()) : "$0"; $("debtV").style.color = debt() ? "var(--neg)" : "";
+  const wk = Date.now() - 7*864e5; $("wkV").textContent = "+" + short(state.log.filter(x => x.t > wk && (x.k === "earn" || x.k === "bonus")).reduce((s,x) => s + x.a, 0));
+  $("homeAlert").innerHTML = debtAlert();
+  let acc = accRow(`<div class="ico round" style="background:var(--brand-soft);color:var(--brand)">${svg("card")}</div>`, "Checking", "Task payouts land here", cents(state.checking), "", "money")
+    + accRow(`<div class="ico round" style="background:var(--pos-soft);color:var(--pos)">${svg("bonus")}</div>`, "Savings", (SAV_APY*100).toFixed(2) + "% APY · +" + cents(state.interestEarned) + " earned", cents(state.savings), "", "money");
+  for (const c of state.cards){ const p = CARD[c.t];
+    acc += accRow(`<div class="minicard" style="background:${p.bg}"></div>`, p.name + " ••" + c.last4, c.pastDue ? '<span style="color:var(--neg);font-weight:700">Past due · frozen</span>' : c.due ? "Min " + cents(Math.max(0, c.min - c.paid)) + " · " + dueLabel(c.due).replace("Due ", "due ") : "No payment due", c.bal ? "-" + cents(c.bal) : "$0.00", money(cardAvail(c)) + " available", "money"); }
+  if (!state.cards.length) acc += accRow(`<div class="ico round" style="background:var(--sunk);color:var(--muted)">${svg("card")}</div>`, "Credit cards", "Open a card to buy now, pay later", "", "", "money");
+  acc += accRow(`<div class="ico round" style="background:color-mix(in srgb,var(--c-homes) 14%,transparent);color:var(--c-homes)">${svg("gem")}</div>`, "Assets", state.owned.length + " item" + (state.owned.length === 1 ? "" : "s") + " owned", short(assetsVal()), "", "assets");
+  $("accList").innerHTML = acc;
+  const lv = level(), c0 = lvlNeed(lv), n = lvlNeed(lv+1);
+  $("lvV").textContent = "Level " + lv; $("lvTxt").textContent = "+" + Math.round((lv-1)*LVL_BONUS*100) + "% pay";
+  $("lvBar").style.width = lv >= MAX_LVL ? "100%" : Math.min(100, (state.totalEarned - c0)/(n - c0)*100).toFixed(1) + "%";
+  $("lvSub").textContent = lv >= MAX_LVL ? "Max level reached" : short(n - state.totalEarned) + " more earned to reach Level " + (lv+1) + " of " + MAX_LVL;
+  const st = liveStreak(), safe = state.streak.last === todayStr();
+  $("stV").textContent = st + (st === 1 ? " day" : " days");
+  $("stSub").textContent = !st ? "Finish a task today to start one." : safe ? "Safe today. +" + Math.min(st,STREAK_CAP)*STREAK_BONUS*100 + "% on payouts." : "Finish one today or it resets.";
+  const dc = state.daily.day === todayStr() ? state.daily.count : 0, paid = state.daily.day === todayStr() && state.daily.paid;
+  $("dots").innerHTML = Array.from({length:DAILY_GOAL}, (_, i) => `<i class="${i < dc ? "on" : ""}"></i>`).join("");
+  $("dgSub").textContent = paid ? "Bonus paid today." : (DAILY_GOAL - Math.min(dc,DAILY_GOAL)) + " more today for +" + short(DAILY_BONUS);
+  const open = state.tasks.filter(t => !t.done).sort((a,b) => urg(a) - urg(b)), top = open[0];
+  $("nextWrap").innerHTML = top ? (() => { const p = payoutFor(top); return `<div class="sechead"><h2>Up next</h2><button class="link" data-goto="tasks">All tasks (${open.length})</button></div><div class="card next"><div class="t">${esc(top.title)}</div><div class="meta">${dueChip(top)}<span class="chip">${esc(top.cat)}</span></div><div class="row between"><button class="btn pos big" data-act="done" data-id="${top.id}">Done · deposit ${money(p.amt)}</button><span class="lbl">${pastDueCards().length ? "Half goes to your past-due card" : p.why === "early bonus" ? "Includes 10% early bonus" : p.why === "late" ? "Late: half pay. Still worth it." : p.why === "on time" ? "Full pay if you finish today" : ""}</span></div></div>`; })()
+    : `<div class="card next"><div class="t">No open tasks</div><div class="row between"><span class="lbl">Add what you need to get done and start earning.</span><button class="btn" data-goto="tasks">Add a task</button></div></div>`;
+  const d = state.dream && BYID[state.dream];
+  $("goalWrap").innerHTML = d ? (() => { const pct = Math.min(100, cashTotal()/d.price*100); return `<div class="sechead"><h2>Savings goal</h2><button class="link" data-act="pin" data-id="${d.id}">Remove</button></div><div class="card goal"><div class="ico lg" style="${tint(d.dept)}">${svg(d.icon)}</div><div style="min-width:0"><div style="font-weight:700">${esc(d.name)}</div><div class="meter pos" style="margin:6px 0 4px"><i style="width:${pct.toFixed(1)}%"></i></div><div class="lbl">${pct >= 100 ? "You have enough cash" : short(d.price - cashTotal()) + " to go of " + short(d.price)}</div></div><div class="pct num">${Math.floor(pct)}%</div></div>`; })()
+    : `<div class="sechead"><h2>Savings goal</h2></div><div class="card goal" style="grid-template-columns:1fr auto"><span class="lbl">Tap the heart on anything in the Shop to track it here.</span><button class="btn ghost sm" data-goto="shop">Browse</button></div>`;
+  $("txHome").innerHTML = state.log.length ? state.log.slice(0, 8).map(txRow).join("") : `<div class="empty">No activity yet. Finish a task to make your first deposit.</div>`;
+}
+function txRow(x){
+  const m = {earn:["check","--c-mkt"], bonus:["bonus","--c-nov"], interest:["bonus","--c-mkt"], reverse:["sell","--c-guns"], sell:["sell","--c-cars"], mod:["wrench","--c-mod"], xfer:["sell","--c-air"], payment:["card","--c-cars"], garnish:["card","--c-off"], charge:["card","--c-life"], fee:["card","--c-off"], open:["card","--c-nov"]}[x.k];
+  const ic = x.k === "buy" && DEPT[x.d] ? DEPT[x.d].i : (m ? m[0] : "star");
+  const style = x.k === "buy" && DEPT[x.d] ? tint(x.d) : `background:color-mix(in srgb,var(${m ? m[1] : "--c-mod"}) 14%,transparent);color:var(${m ? m[1] : "--c-mod"})`;
+  const when = new Date(x.t).toLocaleDateString("en-US", {month:"short", day:"numeric"}) + ", " + new Date(x.t).toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit"});
+  const isCard = x.acct && x.acct.startsWith("cc_"), shown = isCard ? -x.a : x.a;
+  return `<div class="tx"><div class="ico round" style="${style}">${svg(ic)}</div><div style="min-width:0"><div class="nm">${esc(x.l)}</div><div class="sub">${esc(acctName(x.acct))} · ${when}</div></div><div class="amt num ${x.a > 0 ? "pos" : ""}">${x.k === "open" ? "" : (x.a > 0 ? "+" : "") + cents(x.a)}</div></div>`;
+}
+function renderActivity(){ $("txAll").innerHTML = state.log.length ? state.log.map(txRow).join("") : `<div class="empty">No activity yet.</div>`; }
+
+function gauge(score){
+  const f = (score - 300) / 550, a = Math.PI * (1 - f), x = 66 + 54 * Math.cos(a), y = 70 - 54 * Math.sin(a);
+  const col = score >= 740 ? "var(--pos)" : score >= 670 ? "var(--brand)" : score >= 580 ? "var(--warn)" : "var(--neg)";
+  return `<svg viewBox="0 0 132 80" aria-hidden="true"><path d="M12 70a54 54 0 0 1 108 0" fill="none" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/><path d="M12 70A54 54 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="10" stroke-linecap="round"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="var(--surface)" stroke="${col}" stroke-width="3"/></svg>`;
+}
+function renderMoney(){
+  $("moneyAlert").innerHTML = debtAlert();
+  $("chkV").textContent = cents(state.checking); $("savV").textContent = cents(state.savings);
+  $("intV").textContent = cents(state.interestEarned); $("perDayV").textContent = cents(state.savings * SAV_APY / 365);
+  $("apyChip").textContent = (SAV_APY*100).toFixed(2) + "% APY";
+  const sc = creditScore(), u = util();
+  $("scoreBox").innerHTML = `<div>${gauge(sc)}</div><div style="display:grid;gap:8px;min-width:0;width:100%"><div><div class="sv num">${sc}</div><div class="lbl">${sc >= 800 ? "Exceptional" : sc >= 740 ? "Very good" : sc >= 670 ? "Good" : sc >= 580 ? "Fair" : "Poor"}</div></div><div class="factors"><div><span>On-time payments</span><b class="num">${state.credit.onTime}</b></div><div><span>Missed payments</span><b class="num" style="${state.credit.late ? "color:var(--neg)" : ""}">${state.credit.late}</b></div><div><span>Credit used</span><b class="num" style="${u > .3 ? "color:var(--warn)" : ""}">${totalLimit() ? Math.round(u*100) + "%" : "–"}</b></div></div></div>`;
+  $("cardList").innerHTML = state.cards.length ? state.cards.map(c => { const p = CARD[c.t], left = Math.max(0, c.min - c.paid);
+    return `<div class="card ccd"><div class="cc${c.pastDue ? " frozen" : ""}" style="background:${p.bg}"><div class="row between"><span class="nmk">${p.name.toUpperCase()}</span><span class="nmk" style="opacity:.8">BoL</span></div><div class="chipgfx"></div><div class="nr">•••• •••• •••• ${c.last4}</div><div class="lo"><span>Limit ${short(p.limit)}</span><span>${(p.apr*100).toFixed(2)}% APR</span></div></div>
+      <div class="kv"><div><span class="lbl">Balance owed</span><b class="num" style="${c.bal ? "color:var(--neg)" : ""}">${cents(c.bal)}</b></div><div><span class="lbl">Available</span><b class="num">${money(cardAvail(c))}</b></div><div><span class="lbl">${c.pastDue ? "Past due" : "Minimum due"}</span><b class="num" style="${c.pastDue ? "color:var(--neg)" : ""}">${c.due ? cents(left) : "$0.00"}</b></div><div><span class="lbl">Due date</span><b>${c.due ? parse(c.due).toLocaleDateString("en-US",{month:"short",day:"numeric"}) : "None"}</b></div></div>
+      <div class="meter ${c.bal / p.limit > .3 ? "neg" : ""}"><i style="width:${Math.min(100, c.bal / p.limit * 100).toFixed(1)}%"></i></div>
+      <div class="row between"><span class="lbl">${c.bal ? "Interest: about " + cents(c.bal * p.apr / 365) + " a day" : "Nothing owed"}</span><button class="btn sm ${c.pastDue ? "neg" : ""}" data-act="paycard" data-id="${c.id}"${c.bal && state.checking > 0 ? "" : " disabled"}>${c.pastDue ? "Pay past due" : "Make a payment"}</button></div></div>`; }).join("")
+    : `<div class="card empty">No cards yet. Open the Life Card below to buy things before you can afford them. Just know the bill comes due.</div>`;
+  $("offers").innerHTML = CARDS.map(p => { const have = state.cards.some(c => c.t === p.t), ok = sc >= p.score && level() >= p.lvl;
+    return `<div class="offer"><div class="minicard" style="background:${p.bg};width:52px;height:34px"></div><div style="min-width:0"><div style="font-weight:700">${p.name}</div><div class="lbl">${short(p.limit)} limit · ${(p.apr*100).toFixed(2)}% APR${p.score ? " · Needs " + p.score + " score, Level " + p.lvl : " · No requirements"}</div></div>${have ? '<span class="chip green">Open</span>' : `<button class="btn sm${ok ? "" : " ghost"}" data-act="opencard" data-t="${p.t}"${ok ? "" : " disabled"}>${ok ? "Apply" : "Locked"}</button>`}</div>`; }).join("");
+}
+
+function urg(t){ return t.due ? dayDiff(t.due)*10 - (PAY[t.size]||0)/1e6 : 1e6 + t.created/1e13; }
+function dueChip(t){ if (!t.due || t.done) return ""; const n = dayDiff(t.due); return `<span class="chip ${n < 0 ? "red" : n === 0 ? "amber" : n <= 7 ? "blue" : ""}">${dueLabel(t.due)}</span>`; }
+function renderSizes(){ $("sizes").innerHTML = SIZES.map(([k,l,h]) => `<button type="button" class="segb" data-size="${k}" aria-pressed="${k===newSize}"><b>${l}</b><span>+${short(payoutFor({size:k, due:$("f-due").value}).amt)}</span></button>`).join(""); }
+function taskRow(t){
+  const amt = t.done ? t.earned : payoutFor(t).amt, over = !t.done && t.due && dayDiff(t.due) < 0;
+  return `<div class="task${t.done ? " done" : ""}${over ? " over" : ""}"><button class="check" data-act="done" data-id="${t.id}" aria-label="${t.done ? "Mark not done" : "Mark done"}: ${esc(t.title)}">${CHECK}</button>
+  <div class="tb2"><div class="tt">${esc(t.title)}</div><div class="meta">${dueChip(t)}${t.done ? '<span class="chip green">Deposited</span>' : ""}<span class="chip">${esc(t.cat)}</span><span class="chip">${SIZE_LABEL[t.size] || "Standard"}</span></div></div>
+  <div class="tr"><span class="amt num pos">${t.done ? "" : "+"}${short(amt)}</span><button class="x" data-act="del" data-id="${t.id}" aria-label="Delete ${esc(t.title)}">×</button></div></div>`;
+}
+function renderTasks(){
+  renderSizes();
+  const open = state.tasks.filter(t => !t.done), done = state.tasks.filter(t => t.done).sort((a,b) => (b.doneAt||0) - (a.doneAt||0));
+  const groups = [["overdue","Overdue", t => t.due && dayDiff(t.due) < 0],["today","Today", t => t.due && dayDiff(t.due) === 0],["week","This week", t => t.due && dayDiff(t.due) > 0 && dayDiff(t.due) <= 7],["later","Later", t => t.due && dayDiff(t.due) > 7],["nodate","No due date", t => !t.due]];
+  let h = pastDueCards().length ? `<div class="alert" style="margin-top:14px">${WARN}<div><b>You're in collections</b>Half of each payout goes to your past-due card until you're caught up.</div></div>` : "";
+  for (const [k, label, f] of groups){ const items = open.filter(f).sort((a,b) => urg(a) - urg(b)); if (!items.length) continue;
+    h += `<div class="group"><div class="gh ${k}"><h3>${label}</h3><span class="c num">${items.length} · ${short(items.reduce((s,t) => s + payoutFor(t).amt, 0))} pending</span></div><div class="card">${items.map(taskRow).join("")}</div></div>`; }
+  if (!open.length) h += `<div class="card empty group">${state.tasks.length ? "All caught up. Add the next thing above." : "No tasks yet. Add one above to start earning."}</div>`;
+  if (done.length) h += `<details class="done"><summary>Show completed (${done.length})</summary><div class="card">${done.slice(0, 30).map(taskRow).join("")}</div><div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="clearDone">Clear completed</button><span class="lbl">Removes them from the list. Your money stays.</span></div></details>`;
+  $("taskList").innerHTML = h;
+}
+
+function itemRow(c, counts){
+  const ok = canPay(c.price), pct = Math.min(100, cashTotal() / c.price * 100);
+  return `<div class="it"><div class="ico" style="${tint(c.dept)}">${svg(c.icon)}</div>
+  <div style="min-width:0"><div class="nm">${esc(c.name)}</div><div class="ds">${esc(c.desc)}${q ? " · " + esc(DEPT_LABEL(c.dept)) : ""}${c.sub ? " · " + esc(c.sub) : ""}${counts[c.id] ? ` · <b style="color:var(--pos)">Owned${counts[c.id] > 1 ? " ×" + counts[c.id] : ""}</b>` : ""}</div></div>
+  <div class="right"><div class="pr num">${money(c.price)}</div><div class="row" style="gap:4px;flex-wrap:nowrap">${ok ? "" : `<div style="width:90px"><div class="meter pos"><i style="width:${pct.toFixed(1)}%"></i></div></div>`}<button class="heart" data-act="pin" data-id="${c.id}" aria-pressed="${state.dream === c.id}" aria-label="Save ${esc(c.name)} as goal">${HEART}</button><button class="btn sm${ok ? " pos" : ""}" data-act="buy" data-id="${c.id}"${ok ? "" : " disabled"}>Buy</button></div></div></div>`;
+}
+function renderShop(){
+  $("shopBal").textContent = "Checking " + short(state.checking) + (state.cards.length ? " · Credit " + short(state.cards.filter(cardUsable).reduce((s,c) => s + cardAvail(c), 0)) : "");
+  $("depts").innerHTML = DEPTS.map(d => `<button class="dept" data-dept="${d.k}" aria-pressed="${d.k === dept && !q}"><span class="ico" style="${tint(d.k)}">${svg(d.i)}</span>${DEPT_LABEL(d.k)}</button>`).join("");
+  $("subs").innerHTML = q || !DEPT[dept].subs.length ? "" : ["All", ...DEPT[dept].subs].map(s => `<button class="subb" data-sub="${s}" aria-pressed="${s === sub}">${s}</button>`).join("");
+  const counts = {}; state.owned.forEach(o => counts[o.itemId] = (counts[o.itemId]||0) + 1);
+  if (dept === "Marketplace" && !q){
+    $("tools").hidden = true; $("moreBox").innerHTML = "";
+    const owned = new Set(state.owned.map(o => o.itemId)), grads = ["#3B4A6B,#1C2540","#6B4A3B,#3A2318","#3B6B5E,#16362E","#5E3B6B,#2E1A38","#6B653B,#36321A","#3B5A6B,#182C36"];
+    $("shopList").innerHTML = `<p class="lbl" style="margin:0 0 12px">Cheap local rides from private sellers around San Diego. Every one can take upgrades.</p><div class="mgrid">` + CATALOG.filter(c => c.dept === "Marketplace").sort((a,b) => a.price - b.price).map((c, i) => {
+      const sold = owned.has(c.id), ok = canPay(c.price), g = grads[i % grads.length].split(",");
+      return `<div class="card listing"><div class="photo" style="background:linear-gradient(160deg,${g[0]},${g[1]})">${svg(c.icon)}<span class="ph">${esc(c.miles)}</span></div><div class="lb"><div class="p num">${money(c.price)}</div><div style="font-weight:600">${esc(c.name)}</div><div class="s">${esc(c.place)}, CA · Listed by ${esc(c.seller)}</div><div class="q">“${esc(c.desc)}”</div>${sold ? '<button class="btn sm ghost" disabled>Sold to you</button>' : `<button class="btn sm${ok ? " pos" : ""}" data-act="buy" data-id="${c.id}"${ok ? "" : " disabled"}>${ok ? "Buy it" : "Can't afford yet"}</button>`}</div></div>`; }).join("") + `</div>`;
+    return;
+  }
+  $("tools").hidden = false;
+  let items = q ? CATALOG.filter(c => c.dept !== "Marketplace" && (c.name + " " + c.desc + " " + c.sub + " " + c.dept).toLowerCase().includes(q)) : CATALOG.filter(c => c.dept === dept && (sub === "All" || c.sub === sub));
+  if (sort === "afford") items = items.filter(c => canPay(c.price)).sort((a,b) => b.price - a.price);
+  else items.sort((a,b) => sort === "asc" ? a.price - b.price : b.price - a.price);
+  $("shopList").innerHTML = `<div class="card">${items.length ? items.slice(0, limit).map(c => itemRow(c, counts)).join("") : `<div class="empty">${sort === "afford" ? "Nothing here fits your balance or credit yet." : "No matches."}</div>`}</div>`;
+  $("moreBox").innerHTML = items.length > limit ? `<button class="btn ghost" data-act="more">Show more (${items.length - limit} left)</button>` : "";
+}
+function assetRow(o){
+  const c = BYID[o.itemId] || {name:"Retired item", icon:"star", dept:"Cars"}, canMod = DEPT[c.dept] && DEPT[c.dept].mods.length;
+  const veh = isVehicle(c), dec = isDecor(c), home = isHome(c), at = locOf(o);
+  let sub = "Bought " + new Date(o.boughtAt).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  if (veh) sub = quickSpec(o);
+  let where = "";
+  if (veh) where = at ? `<span class="chip blue">Garage · ${esc(homeName(at))}</span>` : `<span class="chip">Not parked</span>`;
+  if (dec) where = at ? `<span class="chip blue">On display · ${esc(homeName(at))}</span>` : `<span class="chip">In storage</span>`;
+  if (home){ const cap = homeCap(o), g = placedIn(o, "g").length, d = placedIn(o, "d").length; where = `<span class="chip">Garage ${g}/${cap.g}</span><span class="chip">Display ${d}/${cap.d}</span>`; }
+  const mods = o.mods.length ? `<span class="chip">${o.mods.length} upgrade${o.mods.length > 1 ? "s" : ""}</span>` : "";
+  const nameBtn = veh ? `<button class="link" style="color:var(--ink);font-size:15px;text-align:left" data-act="specs" data-id="${o.id}" title="${esc(quickSpec(o))}">${esc(c.name)}</button>` : home ? `<button class="link" style="color:var(--ink);font-size:15px;text-align:left" data-act="home" data-id="${o.id}">${esc(c.name)}</button>` : esc(c.name);
+  const btns = [veh ? `<button class="btn sm ghost" data-act="specs" data-id="${o.id}">Specs</button>` : "", home ? `<button class="btn sm ghost" data-act="home" data-id="${o.id}">Manage</button>` : "", (veh || dec) && homesOwned().length ? `<button class="btn sm ghost" data-act="place" data-id="${o.id}">${veh ? "Park" : "Place"}</button>` : "", canMod ? `<button class="btn sm" data-act="mods" data-id="${o.id}">Upgrade</button>` : "", `<button class="btn sm ${armed === o.id ? "neg" : "ghost"}" data-act="sell" data-id="${o.id}">${armed === o.id ? "Sell for " + short(val(o)*SELL_RATE) + "?" : "Sell"}</button>`].join("");
+  return `<div class="it"><div class="ico" style="${tint(c.dept)}">${svg(c.icon)}</div><div style="min-width:0"><div class="nm">${nameBtn}</div><div class="ds">${esc(sub)}</div><div class="modtags">${where}${mods}</div></div>
+  <div class="right"><div class="pr num">${money(val(o))}</div><div class="row" style="gap:6px;justify-content:flex-end">${btns}</div></div></div>`;
+}
+function renderAssets(){
+  const hp = state.owned.reduce((s,o) => s + hpOf(o), 0), modsSpent = state.owned.reduce((s,o) => s + val(o) - o.price, 0);
+  const vehs = state.owned.filter(o => isVehicle(BYID[o.itemId])), parked = vehs.filter(o => locOf(o)).length;
+  $("sum").innerHTML = `<div class="card"><div class="lbl">Total asset value</div><div class="v num">${short(assetsVal())}</div></div><div class="card"><div class="lbl">Items owned</div><div class="v num">${state.owned.length}</div></div><div class="card"><div class="lbl">Vehicles parked</div><div class="v num">${parked}/${vehs.length}</div></div><div class="card"><div class="lbl">Horsepower added</div><div class="v num">+${hp.toLocaleString()} hp</div></div><div class="card"><div class="lbl">Spent on upgrades</div><div class="v num">${short(modsSpent)}</div></div>`;
+  if (!state.owned.length){ $("assetList").innerHTML = `<div class="card empty" style="margin-top:12px">Nothing owned yet. Finish tasks, then hit the Shop or the Curbside Market for a cheap first ride.</div>`; return; }
+  let h = "";
+  if (vehs.length && !homesOwned().length) h += `<div class="alert warn" style="margin-top:12px">${WARN}<div><b>Your vehicles have nowhere to live</b>Buy a home to park them in its garage. Bigger homes have bigger garages, and you can add more spaces with upgrades.</div></div>`;
+  for (const d of DEPTS){
+    const list = state.owned.filter(o => (BYID[o.itemId] || {dept:"Cars"}).dept === d.k).sort((a,b) => val(b) - val(a)); if (!list.length) continue;
+    h += `<div class="group"><div class="gh"><h3>${DEPT_LABEL(d.k)}</h3><span class="c num">${short(list.reduce((s,o) => s + val(o), 0))}</span></div><div class="card">${list.map(assetRow).join("")}</div></div>`;
+  }
+  $("assetList").innerHTML = h;
+}
+function openSpecs(oid){
+  const o = state.owned.find(x => x.id === oid); if (!o) return closeSheet();
+  if (vehInit(o)) save();
+  sheet = {kind:"specs", oid}; const c = BYID[o.itemId], rows = specRows(o), modded = o.mods.length > 0, at = locOf(o);
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div class="row" style="gap:10px;flex-wrap:nowrap;min-width:0"><div class="ico" style="${tint(c.dept)}">${svg(c.icon)}</div><div style="min-width:0"><h2 id="sheetTitle">${esc(c.name)}</h2><div class="lbl">Value ${money(val(o))} · ${at ? "Parked at " + esc(homeName(at)) : "Not parked"}</div></div></div>${closeBtn}</div>
+    <div class="row" style="gap:8px"><button class="btn sm" data-act="mods" data-id="${o.id}">Upgrade</button>${homesOwned().length ? `<button class="btn sm ghost" data-act="place" data-id="${o.id}">Park</button>` : ""}</div>`,
+    `<div class="pad"><div class="row between"><h3>${modded ? "Factory → now" : "Factory specs"}</h3>${modded ? `<span class="chip green">${o.mods.length} upgrade${o.mods.length > 1 ? "s" : ""}</span>` : ""}</div>
+    <div class="card" style="box-shadow:none">${rows.map(([k, f, n]) => { const now = n === undefined ? f : n, changed = n !== undefined && n !== f;
+      return `<div class="spec"><span class="lbl">${k}</span><span class="${k === "VIN" || k === "Stock number" ? "num mono" : ""}">${changed ? `<span class="was">${esc(f)}</span><b class="now">${esc(now)}</b>` : esc(f)}</span></div>`; }).join("")}</div></div>`);
+}
+function openHomeSheet(hid){
+  const h = state.owned.find(x => x.id === hid); if (!h) return closeSheet();
+  sheet = {kind:"home", hid}; const c = BYID[h.itemId], cap = homeCap(h), gs = placedIn(h, "g"), ds_ = placedIn(h, "d");
+  const freeV = state.owned.filter(o => isVehicle(BYID[o.itemId]) && !locOf(o)), freeD = state.owned.filter(o => isDecor(BYID[o.itemId]) && !locOf(o));
+  const row = (o, act, label) => { const it = BYID[o.itemId]; return `<div class="it"><div class="ico" style="${tint(it.dept)}">${svg(it.icon)}</div><div style="min-width:0"><div class="nm">${esc(it.name)}</div><div class="ds">${isVehicle(it) ? esc(quickSpec(o)) : esc(it.desc)}</div></div><div class="right"><button class="btn sm ${act === "unplace" ? "ghost" : ""}" data-act="${act}" data-id="${o.id}">${label}</button></div></div>`; };
+  const homeMods = h.mods.map(k => MODBY[k]).filter(Boolean);
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div class="row" style="gap:10px;flex-wrap:nowrap;min-width:0"><div class="ico" style="${tint(c.dept)}">${svg(c.icon)}</div><div style="min-width:0"><h2 id="sheetTitle">${esc(c.name)}</h2><div class="lbl">Value ${money(val(h))} · Garage ${gs.length}/${cap.g} · Display ${ds_.length}/${cap.d}</div></div></div>${closeBtn}</div>
+    <div class="row" style="gap:8px"><button class="btn sm" data-act="mods" data-id="${h.id}">Upgrade this home</button></div>`,
+    `<div class="modgroup"><h3>Garage · ${gs.length} of ${cap.g} spaces</h3></div>${gs.length ? gs.map(o => row(o, "unplace", "Move out")).join("") : `<div class="empty">Empty garage.</div>`}
+    ${gs.length < cap.g && freeV.length ? `<div class="modgroup"><h3>Park a vehicle here</h3></div>` + freeV.map(o => row(o, "parkhere", "Park here")).join("") : gs.length >= cap.g && freeV.length ? `<div class="pad"><div class="alert warn" style="margin:0">${WARN}<div><b>Garage full</b>Add a Larger garage, Underground garage or Car museum upgrade for more spaces.</div></div></div>` : ""}
+    <div class="modgroup"><h3>On display · ${ds_.length} of ${cap.d} spots</h3></div>${ds_.length ? ds_.map(o => row(o, "unplace", "Remove")).join("") : `<div class="empty">Nothing on display. Collectibles, art and guns can go here.</div>`}
+    ${ds_.length < cap.d && freeD.length ? `<div class="modgroup"><h3>Put on display</h3></div>` + freeD.map(o => row(o, "parkhere", "Display here")).join("") : ds_.length >= cap.d && freeD.length ? `<div class="pad"><div class="alert warn" style="margin:0">${WARN}<div><b>No display space left</b>Add a Trophy room, Gun vault or Art gallery wing.</div></div></div>` : ""}
+    <div class="modgroup"><h3>Installed upgrades</h3></div><div class="pad" style="padding-top:6px">${homeMods.length ? `<div class="modtags">${homeMods.map(m => `<span class="chip green">${esc(m.name)}</span>`).join("")}</div>` : `<span class="lbl">None yet. Add a pool, ballroom, bigger garage and more.</span>`}</div>`);
+}
+function openPlace(oid){
+  const o = state.owned.find(x => x.id === oid); if (!o) return;
+  sheet = {kind:"place", oid}; const it = BYID[o.itemId], kind = isVehicle(it) ? "g" : "d", at = locOf(o);
+  showSheet(`<div class="row between" style="flex-wrap:nowrap"><div><h2 id="sheetTitle">${kind === "g" ? "Park" : "Place"} ${esc(it.name)}</h2><div class="lbl">${at ? "Now at " + esc(homeName(at)) : kind === "g" ? "Not parked" : "In storage"}</div></div>${closeBtn}</div>`,
+    `<div class="pad">${homesOwned().map(h => { const cap = homeCap(h)[kind], used = placedIn(h, kind).filter(x => x.id !== o.id).length, here = o.loc === h.id, full = used >= cap;
+      return `<button class="payopt" data-act="placeto" data-hid="${h.id}" aria-pressed="${here}"${full && !here ? " disabled" : ""}><div class="ico" style="${tint("Homes")}">${svg(BYID[h.itemId].icon)}</div><div style="min-width:0"><div style="font-weight:700">${esc(homeName(h))}</div><div class="lbl">${kind === "g" ? "Garage" : "Display"} ${used}/${cap}${full && !here ? " · full" : ""}</div></div><div class="lbl">${here ? "Here now" : ""}</div></button>`; }).join("")}
+    ${at ? `<button class="btn ghost wide" data-act="unplace" data-id="${o.id}">${kind === "g" ? "Move out of garage" : "Put in storage"}</button>` : ""}</div>`);
+}
+function placeItem(oid, hid){
+  const o = state.owned.find(x => x.id === oid), h = state.owned.find(x => x.id === hid); if (!o || !h) return;
+  const kind = isVehicle(BYID[o.itemId]) ? "g" : "d";
+  if (o.loc !== hid && placedIn(h, kind).length >= homeCap(h)[kind]){ toast("No space left there."); return; }
+  o.loc = hid; save(); sfx("tick"); toast((kind === "g" ? "Parked at " : "Displayed at ") + homeName(h));
+}
+
+function render(){
+  renderTop();
+  if (tab === "home") renderHome();
+  if (tab === "money") renderMoney();
+  if (tab === "tasks") renderTasks();
+  if (tab === "shop") renderShop();
+  if (tab === "assets") renderAssets();
+  if (tab === "activity") renderActivity();
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act],[data-dept],[data-sub],[data-size],[data-goto]"); if (!b) return;
+  if (b.dataset.goto){ go(b.dataset.goto); return; }
+  if (b.dataset.size){ newSize = b.dataset.size; sfx("tick"); renderSizes(); return; }
+  if (b.dataset.dept){ dept = b.dataset.dept; sub = "All"; q = ""; $("q").value = ""; limit = 40; sfx("tick"); renderShop(); return; }
+  if (b.dataset.sub){ sub = b.dataset.sub; limit = 40; sfx("tick"); renderShop(); return; }
+  const id = b.dataset.id;
+  switch (b.dataset.act){
+    case "done": complete(id, b); break;
+    case "del": remove(id); break;
+    case "clearDone": { const before = snap(), n = state.tasks.filter(t => t.done).length; state.tasks = state.tasks.filter(t => !t.done); save(); render(); toast("Cleared " + n + " completed task" + (n === 1 ? "" : "s"), () => restore(before)); break; }
+    case "buy": sheet = null; openBuySheet(id); break;
+    case "pick": sheet.src = b.dataset.src; if (sheet.kind === "buy") openBuySheet(sheet.id); else openModPay(sheet.key, sheet.src); break;
+    case "confirmBuy": doBuy(sheet.id, sheet.src); break;
+    case "sell": sell(id); break;
+    case "pin": pin(id); break;
+    case "more": limit += 40; renderShop(); break;
+    case "mods": openModSheet(id); break;
+    case "modbuy": openModPay(b.dataset.key); break;
+    case "confirmMod": doMod(sheet.oid, sheet.key, sheet.src); break;
+    case "close": closeSheet(); break;
+    case "transfer": openTransfer(b.dataset.dir); break;
+    case "paycard": openPay(id); break;
+    case "setamt": $("amt").value = b.dataset.v; break;
+    case "confirmXfer": { const max = sheet.dir === "toSav" ? state.checking : state.savings, v = Math.min(amtVal(), max); if (v > 0) transfer(sheet.dir, v); else toast("Enter an amount."); break; }
+    case "confirmPay": { const v = amtVal(); if (v > 0) payCard(sheet.id, v); else toast("Enter an amount."); break; }
+    case "opencard": openCard(b.dataset.t); break;
+    case "backup": { const code = backupCode(), ta = $("bkText"), fallback = () => { ta.value = code; ta.focus(); ta.select(); toast("Couldn't copy automatically. The code is in the box. Select all and copy it."); };
+      try { navigator.clipboard.writeText(code).then(() => toast("Backup code copied. Paste it into Restore in the other app."), fallback); } catch(e){ fallback(); } break; }
+    case "savebackup": { const blob = new Blob([backupCode()], {type:"text/plain"}), a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "bank-of-life-backup-" + todayStr() + ".txt"; document.body.appendChild(a); a.click(); a.remove(); break; }
+    case "restore": { let raw = $("bkText").value.trim(); if (raw.startsWith("BOL1:")) raw = raw.slice(5);
+      let d = null; try { d = JSON.parse(decodeURIComponent(escape(atob(raw.replace(/\s+/g, ""))))); } catch(e) {}
+      if (!d || typeof d !== "object" || !Array.isArray(d.tasks)){ toast("That code didn't work. Copy the whole code and try again."); break; }
+      if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Tap again to replace everything here"; b.classList.add("neg"); setTimeout(() => { b.dataset.armed = ""; b.textContent = "Restore"; b.classList.remove("neg"); }, 4000); break; }
+      state = normalize(d); accrue(); save(); render(); $("bkText").value = ""; b.dataset.armed = ""; b.textContent = "Restore"; b.classList.remove("neg"); toast("Progress restored."); break; }
+    case "specs": openSpecs(id); break;
+    case "home": openHomeSheet(id); break;
+    case "place": openPlace(id); break;
+    case "placeto": placeItem(sheet.oid, b.dataset.hid); render(); openPlace(sheet.oid); break;
+    case "parkhere": placeItem(id, sheet.hid); render(); openHomeSheet(sheet.hid); break;
+    case "unplace": { const o = state.owned.find(x => x.id === id); if (o){ o.loc = ""; save(); render(); toast("Moved out"); } if (sheet && sheet.kind === "home") openHomeSheet(sheet.hid); else if (sheet && sheet.kind === "place") openPlace(sheet.oid); break; }
+  }
+});
+
+if (accrue()) save();
+render(); connect();
+let day = todayStr(); setInterval(() => { if (todayStr() !== day){ day = todayStr(); if (accrue()) save(); render(); } }, 60000);
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body>
+</html>
